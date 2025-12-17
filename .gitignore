@@ -1,0 +1,26 @@
+# Miscellaneous
+.DS_Store
+.env
+.idea/
+.vscode/
+
+# Build files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+build/
+coverage/
+
+# IDE files
+*.iml
+*.iws
+*.ipr
+*.xmp
+android/.gradle
+android/local.properties
+ios/.symlinks
+ios/Flutter/Generated.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+web/flutter_bootstrap.js
