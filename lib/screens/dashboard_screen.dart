@@ -4,23 +4,11 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '../providers/theme_provider.dart';
 import '../services/local_auth_service.dart';
-import 'tabs/students_tab.dart';
-import 'tabs/teachers_tab.dart';
-import 'tabs/classes_tab.dart';
-import 'tabs/subjects_tab.dart';
-import 'tabs/settings_tab.dart';
-import 'tabs/reports_tab.dart';
-import 'grades_screen.dart';
-import 'timetable_screen.dart';
-import 'attendance_screen.dart';
-import 'student_affairs_screen.dart';
-import 'parent_portal_screen.dart'; // Add this import
-import 'teacher_portal_screen.dart';
-import 'student_portal_screen.dart';
-import '../student_model.dart'; // Add this import
-import '../grade_model.dart'; // Add this import
-import 'events_screen.dart'; // Import EventsScreen
-import 'staff_management_screen.dart'; // Import StaffManagementScreen
+import '../student_model.dart'; // Re-adding student model import
+import '../grade_model.dart'; // Re-adding grade model import
+// Imports for specific feature screens are now managed via app_constants.dart
+
+import '../providers/permission_provider.dart';
 
 import '../providers/student_provider.dart';
 import '../providers/teacher_provider.dart';
@@ -28,6 +16,8 @@ import '../providers/class_provider.dart';
 import '../providers/grade_provider.dart';
 import '../providers/attendance_provider.dart';
 import '../providers/timetable_provider.dart';
+
+import '../utils/app_constants.dart'; // Import new constants file
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -47,346 +37,116 @@ class DashboardScreenState extends State<DashboardScreen> {
     final String? userRole = currentUser?.role;
     final bool isDesktop = MediaQuery.of(context).size.width >= 600;
 
-    List<Widget> widgetOptions = [];
-    List<NavigationRailDestination> navigationRailDestinations = [];
-    List<BottomNavigationBarItem> bottomNavigationBarItems = [];
+    return Consumer<PermissionProvider>(
+      builder: (context, permissionProvider, child) {
+        final List<Widget> widgetOptions = [];
+        final List<NavigationRailDestination> navigationRailDestinations = [];
+        final List<BottomNavigationBarItem> bottomNavigationBarItems = [];
 
-    // Admin Role Configuration
-    if (userRole == 'admin') {
-      widgetOptions = <Widget>[
-        DashboardSummary(userRole: userRole),
-        const StudentsTab(),
-        const TeachersTab(),
-        const ClassesTab(),
-        const SubjectsTab(),
-        const TimetableScreen(),
-        const GradesScreen(),
-        const AttendanceScreen(),
-        const ReportsTab(),
-        const StudentAffairsScreen(),
-        const EventsScreen(), // Add EventsScreen
-        const StaffManagementScreen(), // Add StaffManagementScreen
-        const SettingsTab(),
-      ];
-      navigationRailDestinations = const <NavigationRailDestination>[
-        NavigationRailDestination(
-          icon: Icon(Icons.dashboard_outlined),
-          selectedIcon: Icon(Icons.dashboard),
-          label: Text('لوحة التحكم'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.school_outlined),
-          selectedIcon: Icon(Icons.school),
-          label: Text('الطلاب'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.person_outlined),
-          selectedIcon: Icon(Icons.person),
-          label: Text('المعلمين'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.class_outlined),
-          selectedIcon: Icon(Icons.class_),
-          label: Text('الفصول'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.book_outlined),
-          selectedIcon: Icon(Icons.book),
-          label: Text('المواد'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.calendar_today_outlined),
-          selectedIcon: Icon(Icons.calendar_today),
-          label: Text('الجدول'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.grade_outlined),
-          selectedIcon: Icon(Icons.grade),
-          label: Text('الدرجات'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.check_circle_outline),
-          selectedIcon: Icon(Icons.check_circle),
-          label: Text('الحضور'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.bar_chart_outlined),
-          selectedIcon: Icon(Icons.bar_chart),
-          label: Text('التقارير'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.business_center_outlined),
-          selectedIcon: Icon(Icons.business_center),
-          label: Text('شؤون الطلاب'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.event_outlined),
-          selectedIcon: Icon(Icons.event),
-          label: Text('الفعاليات'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.group_outlined),
-          selectedIcon: Icon(Icons.group),
-          label: Text('الموظفين'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('الإعدادات'),
-        ),
-      ];
-      bottomNavigationBarItems = const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: 'لوحة التحكم',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.school), label: 'الطلاب'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'المعلمين'),
-        BottomNavigationBarItem(icon: Icon(Icons.class_), label: 'الفصول'),
-        BottomNavigationBarItem(icon: Icon(Icons.book), label: 'المواد'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
-          label: 'الجدول',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.grade), label: 'الدرجات'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.check_circle),
-          label: 'الحضور',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'التقارير'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.business_center),
-          label: 'شؤون الطلاب',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.event), label: 'الفعاليات'),
-        BottomNavigationBarItem(icon: Icon(Icons.group), label: 'الموظفين'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
-      ];
-    }
-    // Teacher Role Configuration
-    else if (userRole == 'teacher') {
-      widgetOptions = <Widget>[
-        TeacherPortalScreen(),
-        const ClassesTab(),
-        const SubjectsTab(),
-        const TimetableScreen(),
-        const GradesScreen(),
-        const AttendanceScreen(),
-        const ReportsTab(),
-        const SettingsTab(),
-      ];
-      navigationRailDestinations = const <NavigationRailDestination>[
-        NavigationRailDestination(
-          icon: Icon(Icons.person_pin_outlined),
-          selectedIcon: Icon(Icons.person_pin),
-          label: Text('بوابة المعلم'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.class_outlined),
-          selectedIcon: Icon(Icons.class_),
-          label: Text('الفصول'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.book_outlined),
-          selectedIcon: Icon(Icons.book),
-          label: Text('المواد'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.calendar_today_outlined),
-          selectedIcon: Icon(Icons.calendar_today),
-          label: Text('الجدول'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.grade_outlined),
-          selectedIcon: Icon(Icons.grade),
-          label: Text('الدرجات'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.check_circle_outline),
-          selectedIcon: Icon(Icons.check_circle),
-          label: Text('الحضور'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.bar_chart_outlined),
-          selectedIcon: Icon(Icons.bar_chart),
-          label: Text('التقارير'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('الإعدادات'),
-        ),
-      ];
-      bottomNavigationBarItems = const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_pin),
-          label: 'بوابة المعلم',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.class_), label: 'الفصول'),
-        BottomNavigationBarItem(icon: Icon(Icons.book), label: 'المواد'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
-          label: 'الجدول',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.grade), label: 'الدرجات'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.check_circle),
-          label: 'الحضور',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'التقارير'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
-      ];
-    }
-    // Student Role Configuration
-    else if (userRole == 'student') {
-      widgetOptions = <Widget>[
-        StudentPortalScreen(),
-        const TimetableScreen(),
-        const GradesScreen(),
-        const AttendanceScreen(),
-        const SettingsTab(),
-      ];
-      navigationRailDestinations = const <NavigationRailDestination>[
-        NavigationRailDestination(
-          icon: Icon(Icons.school_outlined),
-          selectedIcon: Icon(Icons.school),
-          label: Text('بوابة الطالب'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.calendar_today_outlined),
-          selectedIcon: Icon(Icons.calendar_today),
-          label: Text('الجدول'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.grade_outlined),
-          selectedIcon: Icon(Icons.grade),
-          label: Text('الدرجات'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.check_circle_outline),
-          selectedIcon: Icon(Icons.check_circle),
-          label: Text('الحضور'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('الإعدادات'),
-        ),
-      ];
-      bottomNavigationBarItems = const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.school),
-          label: 'بوابة الطالب',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
-          label: 'الجدول',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.grade), label: 'الدرجات'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.check_circle),
-          label: 'الحضور',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
-      ];
-    }
-    // Parent Role Configuration
-    else if (userRole == 'parent') {
-      widgetOptions = <Widget>[
-        DashboardSummary(userRole: userRole),
-        const ParentPortalScreen(),
-        const SettingsTab(),
-      ];
-      navigationRailDestinations = const <NavigationRailDestination>[
-        NavigationRailDestination(
-          icon: Icon(Icons.dashboard_outlined),
-          selectedIcon: Icon(Icons.dashboard),
-          label: Text('لوحة التحكم'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.family_restroom_outlined),
-          selectedIcon: Icon(Icons.family_restroom),
-          label: Text('بوابة ولي الأمر'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('الإعدادات'),
-        ),
-      ];
-      bottomNavigationBarItems = const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: 'لوحة التحكم',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.family_restroom),
-          label: 'بوابة ولي الأمر',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'الإعدادات'),
-      ];
-    }
+        // Manually handle DashboardSummary as its widget is dynamic
+        if (permissionProvider.hasPermission(AppFeatures.dashboard)) {
+          final data = allFeatureData[AppFeatures.dashboard]!;
+          widgetOptions.add(DashboardSummary(userRole: userRole));
+          navigationRailDestinations.add(_buildRailDestination(data));
+          bottomNavigationBarItems.add(_buildBottomNavigationItem(data));
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('مرحباً، ${currentUser?.username ?? 'زائر'}'),
-        actions: [
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return IconButton(
-                icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
-                onPressed: () {
-                  themeProvider.toggleTheme(!isDarkMode);
-                },
-                tooltip: 'تبديل السمة',
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              authService.signOut();
-            },
-            tooltip: 'تسجيل الخروج',
-          ),
-        ],
-      ),
-            body: Row(
-              children: [
-                if (isDesktop)
-                  Expanded(
-                    child: NavigationRail(
-                      selectedIndex: _selectedIndex,
-                      onDestinationSelected: (int index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
-                      labelType: NavigationRailLabelType.all,
-                      destinations: navigationRailDestinations,
-                    ),
-                  ),
-                Expanded(child: widgetOptions.elementAt(_selectedIndex)),
-              ],
+        allFeatureData.forEach((feature, data) {
+          if (feature != AppFeatures.dashboard && permissionProvider.hasPermission(feature)) {
+            widgetOptions.add(data['widget'] as Widget);
+            navigationRailDestinations.add(_buildRailDestination(data));
+            bottomNavigationBarItems.add(_buildBottomNavigationItem(data));
+          }
+        });
+
+        if (widgetOptions.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Dashboard')),
+            body: const Center(
+              child: Text('You do not have permission to view any features.'),
             ),
-            bottomNavigationBar: isDesktop
-                ? null
-                : BottomNavigationBar(
-                    items: bottomNavigationBarItems,
-                    currentIndex: _selectedIndex,
-                    onTap: (int index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
+          );
+        }
+
+        if (_selectedIndex >= widgetOptions.length) {
+          _selectedIndex = 0;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('مرحباً، ${currentUser?.username ?? 'زائر'}'),
+            actions: [
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return IconButton(
+                    icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
+                    onPressed: () {
+                      themeProvider.toggleTheme(!isDarkMode);
                     },
-                    selectedItemColor: Theme.of(context).primaryColor,
-                    unselectedItemColor: Colors.grey,
-                    type: BottomNavigationBarType.fixed,
-                  ),
+                    tooltip: 'تبديل السمة',
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  authService.signOut();
+                },
+                tooltip: 'تسجيل الخروج',
+              ),
+            ],
+          ),
+          body: Row(
+            children: [
+              if (isDesktop)
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  labelType: NavigationRailLabelType.all,
+                  destinations: navigationRailDestinations,
+                ),
+              Expanded(child: widgetOptions.elementAt(_selectedIndex)),
+            ],
+          ),
+          bottomNavigationBar: isDesktop
+              ? null
+              : BottomNavigationBar(
+                  items: bottomNavigationBarItems,
+                  currentIndex: _selectedIndex,
+                  onTap: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  selectedItemColor: Theme.of(context).primaryColor,
+                  unselectedItemColor: Colors.grey,
+                  type: BottomNavigationBarType.fixed,
+                ),
+        );
+      },
+    );
+  }
+
+  NavigationRailDestination _buildRailDestination(Map<String, dynamic> data) {
+    return NavigationRailDestination(
+      icon: Icon(data['icon'] as IconData),
+      selectedIcon: Icon(data['icon'] as IconData),
+      label: Text(data['label'] as String),
+    );
+  }
+
+  BottomNavigationBarItem _buildBottomNavigationItem(Map<String, dynamic> data) {
+    return BottomNavigationBarItem(
+      icon: Icon(data['icon'] as IconData),
+      label: data['label'] as String,
     );
   }
 }
-
+ 
 class DashboardSummary extends StatelessWidget {
   final String? userRole;
   const DashboardSummary({super.key, this.userRole});

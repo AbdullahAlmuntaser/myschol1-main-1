@@ -64,10 +64,33 @@ class AcademicYearsScreen extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () {
-                                  // TODO: Implement delete confirmation dialog
-                                  Provider.of<AcademicYearProvider>(context,
-                                          listen: false)
-                                      .deleteAcademicYear(academicYear.id!);
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('تأكيد الحذف'),
+                                      content: const Text(
+                                          'هل أنت متأكد أنك تريد حذف هذا العام الدراسي؟'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: const Text('إلغاء'),
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('حذف'),
+                                          onPressed: () {
+                                            Provider.of<AcademicYearProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .deleteAcademicYear(
+                                                    academicYear.id!);
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                               ),
                               if (!academicYear.isActive)

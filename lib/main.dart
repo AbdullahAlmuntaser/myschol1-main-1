@@ -15,6 +15,7 @@ import 'providers/event_provider.dart';
 import 'providers/staff_provider.dart';
 import 'providers/leave_provider.dart'; // Import LeaveProvider
 import 'providers/performance_evaluation_provider.dart'; // Import PerformanceEvaluationProvider
+import 'providers/permission_provider.dart';
 import 'database_helper.dart';
 import 'screens/grades_screen.dart';
 import 'screens/attendance_screen.dart';
@@ -22,6 +23,7 @@ import 'services/local_auth_service.dart';
 import 'services/notification_service.dart'; // Import NotificationService
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/admin_manage_users_screen.dart'; // New: Import AdminManageUsersScreen
 import 'dart:developer' as developer;
 
 final notificationService =
@@ -55,6 +57,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => StaffProvider()),
         ChangeNotifierProvider(create: (_) => LeaveProvider()), // Add LeaveProvider
         ChangeNotifierProvider(create: (_) => PerformanceEvaluationProvider()), // Add PerformanceEvaluationProvider
+        ChangeNotifierProvider(create: (_) => PermissionProvider()),
         Provider<NotificationService>.value(
           value: notificationService,
         ), // Provide NotificationService
@@ -76,10 +79,12 @@ class MyApp extends StatelessWidget {
               AttendanceScreen.routeName: (context) => const AttendanceScreen(),
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
+              '/admin_manage_users': (context) => const AdminManageUsersScreen(), // New: Admin Manage Users Screen
             },
             debugShowCheckedModeBanner: false,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
@@ -115,6 +120,10 @@ class _AppInitializerState extends State<AppInitializer> {
       'AppInitializer: Initializing providers and authenticating...',
       name: 'AppInitializer',
     );
+
+    // Initial delay to ensure context is ready
+    await Future.delayed(Duration.zero);
+    if (!mounted) return;
 
     while (Provider.of<LocalAuthService>(
       context,
@@ -276,7 +285,7 @@ class _AppInitializerState extends State<AppInitializer> {
               } else {
                 developer.log(
                   'AppInitializer: User not authenticated or currentUser is null. Navigating to LoginScreen.',
-                  name: 'AppInitializer',
+                  name: 'MyApp', // Changed from AppInitializer
                 );
                 return const LoginScreen();
               }

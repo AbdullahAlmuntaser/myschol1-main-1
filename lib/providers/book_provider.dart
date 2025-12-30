@@ -32,8 +32,9 @@ class BookProvider with ChangeNotifier {
     await _fetchBooks();
   }
 
-  Future<List<Book>> searchBooks(String query) async {
-    return await _databaseHelper.searchBooks(query);
+  Future<void> searchBooks(String query) async {
+    _books = await _databaseHelper.searchBooks(query);
+    notifyListeners();
   }
 
   Future<Book?> getBookById(int id) async {

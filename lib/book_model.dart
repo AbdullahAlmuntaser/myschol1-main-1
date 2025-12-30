@@ -30,10 +30,10 @@ class Book {
       'author': author,
       'isbn': isbn,
       'genre': genre,
-      'totalCopies': totalCopies,
-      'availableCopies': availableCopies,
+      'total_copies': totalCopies,
+      'available_copies': availableCopies,
       'description': description,
-      'imageUrl': imageUrl,
+      'image_url': imageUrl,
     };
   }
 
@@ -44,10 +44,10 @@ class Book {
       author: map['author'] as String,
       isbn: map['isbn'] as String,
       genre: map['genre'] as String,
-      totalCopies: map['totalCopies'] as int,
-      availableCopies: map['availableCopies'] as int,
+      totalCopies: map['total_copies'] as int,
+      availableCopies: map['available_copies'] as int,
       description: map['description'] as String?,
-      imageUrl: map['imageUrl'] as String?,
+      imageUrl: map['image_url'] as String?,
     );
   }
 

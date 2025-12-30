@@ -11,11 +11,13 @@ class LocalAuthService with ChangeNotifier {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   bool _isSessionLoading =
       true; // New state to indicate if session is being loaded
+  List<User> _users = []; // New: List to hold all fetched users
 
   User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
   bool get isSessionLoading =>
       _isSessionLoading; // Getter for session loading state
+  List<User> get users => _users; // New: Getter for all users
 
   LocalAuthService() {
     _loadUserSession(); // Load session when service is instantiated
@@ -147,11 +149,9 @@ class LocalAuthService with ChangeNotifier {
       final id = await _databaseHelper.createUser(newUser);
       if (id > 0) {
         // Create a new User object with the generated ID from the database
-        _currentUser = newUser.copyWith(id: id);
-        await _saveUserSession(
-          _currentUser!,
-        ); // Save session on successful sign-up
-        notifyListeners();
+        // _currentUser = newUser.copyWith(id: id); // Do not auto-login after general signup, only for admin created.
+        // await _saveUserSession(_currentUser!);
+        // notifyListeners();
         developer.log(
           'LocalAuthService: Sign-up successful for user: $username (ID: $id)',
           name: 'LocalAuthService',
@@ -179,7 +179,6 @@ class LocalAuthService with ChangeNotifier {
   }
 
   void signOut() async {
-    // Made async to await _clearUserSession
     developer.log(
       'LocalAuthService: Attempting to sign out user: ${_currentUser?.username}',
       name: 'LocalAuthService',
@@ -193,11 +192,119 @@ class LocalAuthService with ChangeNotifier {
     );
   }
 
-  Future<List<User>> getUsersByRole(String role) async {
-    // Assuming DatabaseHelper has a method to get users by role or filter them after getting all users
-    final allUsers = await _databaseHelper.getUsers();
-    return allUsers.where((user) => user.role == role).toList();
+  // New: Fetch all users and update the _users list
+  Future<void> fetchUsers() async {
+    developer.log('LocalAuthService: Fetching all users...', name: 'LocalAuthService');
+    try {
+      _users = await _databaseHelper.getUsers();
+      developer.log('LocalAuthService: Fetched ${_users.length} users.', name: 'LocalAuthService');
+      notifyListeners();
+    } catch (e, s) {
+      developer.log(
+        'LocalAuthService: Error fetching users: $e',
+        name: 'LocalAuthService',
+        level: 1000,
+        error: e,
+        stackTrace: s,
+      );
+    }
   }
+
+  // New: Update a user's role
+  Future<bool> updateUserRole(int userId, String newRole) async {
+    developer.log(
+      'LocalAuthService: Attempting to update role for user ID: $userId to $newRole',
+      name: 'LocalAuthService',
+    );
+    try {
+      final success = await _databaseHelper.updateUserRole(userId, newRole);
+      if (success) {
+        // Update the user in the local _users list and potentially _currentUser if it's the current user
+        await fetchUsers(); // Re-fetch all users to ensure consistency
+        if (_currentUser != null && _currentUser!.id == userId) {
+          _currentUser = _currentUser!.copyWith(role: newRole);
+          await _saveUserSession(_currentUser!); // Update session if current user's role changed
+        }
+        developer.log(
+          'LocalAuthService: Successfully updated role for user ID: $userId',
+          name: 'LocalAuthService',
+          level: 800,
+        );
+        return true;
+      }
+      developer.log(
+        'LocalAuthService: Failed to update role for user ID: $userId',
+        name: 'LocalAuthService',
+        level: 900,
+      );
+      return false;
+    } catch (e, s) {
+      developer.log(
+        'LocalAuthService: Error updating user role for user ID: $userId: $e',
+        name: 'LocalAuthService',
+        level: 1000,
+        error: e,
+        stackTrace: s,
+      );
+      return false;
+    }
+  }
+
+  // New: Admin can create a user with a specified role
+  Future<bool> adminCreateUser(String username, String password, String role) async {
+    developer.log(
+      'LocalAuthService: Admin attempting to create user: $username with role: $role',
+      name: 'LocalAuthService',
+    );
+    final existingUser = await _databaseHelper.getUserByUsername(username);
+    if (existingUser != null) {
+      developer.log(
+        'LocalAuthService: Admin create user failed. Username already exists: $username',
+        name: 'LocalAuthService',
+        level: 900,
+      );
+      return false;
+    }
+
+    final hashedPassword = _hashPassword(password);
+    final newUser = User(
+      username: username,
+      passwordHash: hashedPassword,
+      role: role,
+    );
+
+    try {
+      final id = await _databaseHelper.createUser(newUser);
+      if (id > 0) {
+        await fetchUsers(); // Re-fetch all users to show the newly created one
+        developer.log(
+          'LocalAuthService: Admin successfully created user: $username (ID: $id) with role: $role',
+          name: 'LocalAuthService',
+          level: 800,
+        );
+        return true;
+      } else {
+        developer.log(
+          'LocalAuthService: Admin create user failed. Could not create user in database. ID returned: $id',
+          name: 'LocalAuthService',
+          level: 1000,
+        );
+        return false;
+      }
+    } catch (e, s) {
+      developer.log(
+        'LocalAuthService: Error during admin user creation for user: $username',
+        name: 'LocalAuthService',
+        level: 1000,
+        error: e,
+        stackTrace: s,
+      );
+      return false;
+    }
+  }
+
+  // Original getUsersByRole is no longer needed as fetchUsers provides all users.
+  // The AdminManageUsersScreen can filter the 'users' list if needed.
 }
 
 extension on User {

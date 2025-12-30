@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../book_model.dart';
 import '../custom_exception.dart';
+import '../providers/book_provider.dart';
 
 class AddEditBookScreen extends StatefulWidget {
   final Book? book;
@@ -50,34 +52,33 @@ class AddEditBookScreenState extends State<AddEditBookScreen> {
 
   Future<void> _saveBook() async {
     if (_formKey.currentState!.validate()) {
-      // final book = Book(
-      //   id: widget.book?.id,
-      //   title: _titleController.text,
-      //   author: _authorController.text,
-      //   isbn: _isbnController.text,
-      //   genre: _genreController.text,
-      //   totalCopies: int.tryParse(_totalCopiesController.text) ?? 0,
-      //   availableCopies: int.tryParse(_availableCopiesController.text) ?? 0,
-      //   description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
-      //   imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null,
-      // );
+      final book = Book(
+        id: widget.book?.id,
+        title: _titleController.text,
+        author: _authorController.text,
+        isbn: _isbnController.text,
+        genre: _genreController.text,
+        totalCopies: int.tryParse(_totalCopiesController.text) ?? 0,
+        availableCopies: int.tryParse(_availableCopiesController.text) ?? 0,
+        description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
+        imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null,
+      );
 
-      // TODO: Implement saving/updating book using BookProvider
-      // final provider = Provider.of<BookProvider>(context, listen: false);
-      // final message = widget.book == null
-      //     ? 'تمت إضافة الكتاب بنجاح'
-      //     : 'تم تحديث الكتاب بنجاح';
+      final provider = Provider.of<BookProvider>(context, listen: false);
+      final message = widget.book == null
+          ? 'تمت إضافة الكتاب بنجاح'
+          : 'تم تحديث الكتاب بنجاح';
 
       try {
-        // if (widget.book == null) {
-        //   await provider.addBook(book);
-        // } else {
-        //   await provider.updateBook(book);
-        // }
+        if (widget.book == null) {
+          await provider.addBook(book);
+        } else {
+          await provider.updateBook(book);
+        }
         if (!mounted) return;
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Book saved successfully!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
         );
       } on CustomException catch (e) {
         if (!mounted) return;

@@ -4,6 +4,7 @@ import '../services/local_auth_service.dart';
 import 'register_screen.dart';
 import 'dart:developer' as developer;
 import 'package:local_auth/local_auth.dart';
+import '../providers/permission_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -71,6 +72,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
 
+      if (!mounted) return;
+
       if (!success) {
         setState(() {
           _errorMessage = 'اسم المستخدم أو كلمة المرور غير صالحة.';
@@ -86,6 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
           name: 'LoginScreen',
           level: 800,
         );
+        final permissionProvider = Provider.of<PermissionProvider>(context, listen: false);
+        await permissionProvider.loadPermissions(authService.currentUser!.role);
       }
     } else {
       developer.log(

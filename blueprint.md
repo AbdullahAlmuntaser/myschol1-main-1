@@ -25,6 +25,7 @@ This is a complete school management system built using Flutter. The application
 - **Biometric Authentication:** Secure access using local device authentication.
 - **AI Chat:** An integrated chat screen powered by generative AI.
 - **Reporting:** Generation of various reports (e.g., student results).
+- **Dynamic Role-Based Access Control (RBAC):** (In Progress) A system to manage permissions for different user roles dynamically.
 
 ### Design & Style:
 - **Theme:** A custom, modern theme with both Light and Dark modes.
@@ -33,6 +34,24 @@ This is a complete school management system built using Flutter. The application
 - **UI Components:** Consistent use of Material Design components, styled for a cohesive look and feel. Dialogs, buttons, and input fields are all designed to be intuitive.
 
 ## Recent Changes
+
+### Feature: Dynamic Role-Based Access Control (RBAC)
+- **Files:**
+  - `lib/database_helper.dart`
+  - `lib/permission_model.dart`
+  - `lib/providers/permission_provider.dart`
+  - `lib/screens/permissions_management_screen.dart`
+  - `lib/screens/login_screen.dart`
+  - `lib/screens/dashboard_screen.dart`
+- **Changes:**
+  - **Database & Model:** Standardized the `permissions` table and `Permission` model to use `feature` and `isEnabled` fields for better clarity.
+  - **Default Permissions:** Implemented a seeding mechanism in `database_helper.dart` to insert a default set of permissions for all user roles (`admin`, `teacher`, `student`, `parent`) on database creation.
+  - **State Management:** Refactored `permission_provider.dart` to correctly load permissions and added a `togglePermission` method to simplify create/update logic.
+  - **Admin UI:** The `permissions_management_screen.dart` now allows administrators to dynamically enable or disable features for each role.
+  - **Initialization:** Permissions are now loaded from the database immediately after a user successfully logs in via the `login_screen.dart`.
+  - **Dashboard Integration:** The `dashboard_screen.dart` was refactored to be fully dynamic. It now builds its navigation items and accessible tabs based on the permissions of the currently logged-in user.
+- **Reason:** To provide a flexible and secure way to manage application permissions without hardcoding them, allowing administrators to control feature access dynamically.
+- **Status:** Completed
 
 ### Grades Interface UX Improvement
 - **Files:** 
@@ -56,27 +75,4 @@ This is a complete school management system built using Flutter. The application
 
 ## Current Development Plan
 
-### Feature: School Announcements & Notifications Board
-
-This feature will allow administrators and teachers to publish announcements that can be viewed by students and parents, with real-time notifications.
-
-- **Purpose:** Enhance communication within the school ecosystem, ensuring timely dissemination of important information.
-
-- **Files to be created/modified:**
-  - `lib/announcement_model.dart`: To define the data structure for announcements.
-  - `lib/providers/announcement_provider.dart`: To manage the state and database interactions for announcements.
-  - `lib/screens/announcements_screen.dart`: A dedicated screen for viewing and managing announcements.
-  - `lib/screens/dashboard_screen.dart`: To display recent announcements on the dashboard.
-  - `pubspec.yaml`: To add necessary packages for notifications (e.g., `flutter_local_notifications`).
-  - `lib/main.dart`: To initialize notification services.
-
-- **Steps:**
-  1.  Define the `Announcement` model.
-  2.  Create the `AnnouncementProvider` for state management and database operations.
-  3.  Implement a dedicated `AnnouncementsScreen` for creating, viewing, and editing announcements.
-  4.  Integrate a section on the `DashboardScreen` to show a summary of recent announcements.
-  5.  Add `flutter_local_notifications` to `pubspec.yaml` and run `flutter pub get`.
-  6.  Initialize `flutter_local_notifications` in `main.dart`.
-  7.  Implement logic in `AnnouncementProvider` to trigger local notifications for new announcements.
-
-- **Status:** In Progress
+(No active development plan.)

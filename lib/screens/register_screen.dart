@@ -15,9 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String? _errorMessage;
-  String _selectedRole = 'student'; // Default role
-
-  final List<String> _roles = ['admin', 'teacher', 'student'];
+  String _selectedRole = 'student'; // Default role is now fixed to student
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
@@ -41,7 +39,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       if (success) {
-        // Changed from Navigator.pop(context) to pushReplacementNamed
         Navigator.pushReplacementNamed(context, '/login');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -123,28 +120,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
+                // Removed the DropdownButtonFormField for role selection
                 const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedRole,
-                  decoration: const InputDecoration(
-                    labelText: 'الدور',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.badge),
-                  ),
-                  items: _roles.map((String role) {
-                    return DropdownMenuItem<String>(
-                      value: role,
-                      child: Text(
-                        role.replaceFirst(role[0], role[0].toUpperCase()),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedRole = newValue!;
-                    });
-                  },
-                ),
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
