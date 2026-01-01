@@ -88,14 +88,14 @@ class GradeProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<List<Map<String, dynamic>>> getAverageGradesBySubject() async {
+  Future<Map<int, double>> getAverageGradesBySubject(int studentId) async {
     _setLoading(true);
-    final result = await dbHelper.getAverageGradesBySubject();
+    final result = await dbHelper.getAverageGradesBySubject(studentId);
     _setLoading(false);
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> getAverageGradesForClass(int classId) async {
+  Future<Map<int, double>> getAverageGradesForClass(int classId) async {
     _setLoading(true);
     final result = await dbHelper.getAverageGradesForClass(classId);
     _setLoading(false);

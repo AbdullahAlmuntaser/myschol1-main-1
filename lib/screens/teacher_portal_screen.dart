@@ -43,7 +43,7 @@ class _TeacherPortalScreenState extends State<TeacherPortalScreen> {
 
     await classProvider.fetchClasses();
     final classes = classProvider.classes
-        .where((c) => c.teacherId != null && int.tryParse(c.teacherId!) == teacher.id)
+        .where((c) => c.teacherId == teacher.id)
         .toList();
 
     await timetableProvider.fetchTimetableEntries();
@@ -114,7 +114,7 @@ class _TeacherPortalScreenState extends State<TeacherPortalScreen> {
                   return Card(
                     child: ListTile(
                       title: Text(schoolClass.name),
-                      subtitle: Text('Class ID: ${schoolClass.classId}'),
+                      subtitle: Text('Class ID: ${schoolClass.id.toString()}'), // Fixed here
                     ),
                   );
                 },
@@ -143,9 +143,17 @@ class _TeacherPortalScreenState extends State<TeacherPortalScreen> {
                     ],
                   ),
                   ...timetable.map((entry) {
+                    final List<String> daysOfWeek = [
+                      'الأحد',
+                      'الاثنين',
+                      'الثلاثاء',
+                      'الأربعاء',
+                      'الخميس',
+                    ];
+                    final String dayName = daysOfWeek[entry.dayOfWeek - 1];
                     return TableRow(
                       children: [
-                        TableCell(child: Center(child: Text(entry.dayOfWeek))),
+                        TableCell(child: Center(child: Text(dayName))),
                         TableCell(child: Center(child: Text('${entry.startTime} - ${entry.endTime}'))),
                         TableCell(child: Center(child: Text(entry.classId.toString()))),
                         TableCell(child: Center(child: Text(entry.subjectId.toString()))),

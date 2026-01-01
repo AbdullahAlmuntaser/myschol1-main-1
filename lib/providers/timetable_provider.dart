@@ -33,13 +33,13 @@ class TimetableProvider with ChangeNotifier {
 
   // Add a new timetable entry
   Future<void> addTimetableEntry(TimetableEntry entry) async {
-    await _databaseHelper.insertTimetableEntry(entry.toMap());
+    await _databaseHelper.insertTimetableEntry(entry);
     await fetchTimetableEntries(); // Refresh the list by calling the renamed method
   }
 
   // Update an existing timetable entry
   Future<void> updateTimetableEntry(TimetableEntry entry) async {
-    await _databaseHelper.updateTimetableEntry(entry.toMap());
+    await _databaseHelper.updateTimetableEntry(entry);
     await fetchTimetableEntries(); // Refresh the list by calling the renamed method
   }
 

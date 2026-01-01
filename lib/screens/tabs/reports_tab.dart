@@ -7,6 +7,7 @@ import '../../providers/class_provider.dart';
 import '../../providers/subject_provider.dart';
 import '../../providers/grade_provider.dart';
 import '../../class_model.dart';
+import '../../subject_model.dart'; // Import the Subject model
 
 class ReportsTab extends StatefulWidget {
   const ReportsTab({super.key});
@@ -17,7 +18,7 @@ class ReportsTab extends StatefulWidget {
 
 class _ReportsTabState extends State<ReportsTab> {
   SchoolClass? _selectedClass;
-  Future<List<Map<String, dynamic>>>? _averageGradesFuture;
+  Future<Map<int, double>>? _averageGradesFuture;
 
   void _fetchAverageGrades(int classId) {
     setState(() {
@@ -70,72 +71,90 @@ class _ReportsTabState extends State<ReportsTab> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    if (_averageGradesFuture != null)
-                      FutureBuilder<List<Map<String, dynamic>>>(
-                        future: _averageGradesFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('خطأ: ${snapshot.error}'));
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('لا توجد بيانات درجات لهذا الفصل.'));
-                          }
-
-                          final data = snapshot.data!;
-                          return SizedBox(
-                            height: 250,
-                            child: BarChart(
-                              BarChartData(
-                                alignment: BarChartAlignment.spaceAround,
-                                maxY: 100, // Assuming grades are out of 100
-                                titlesData: FlTitlesData(
-                                  show: true,
-                                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (double value, TitleMeta meta) {
-                                        final index = value.toInt();
-                                        if (index >= 0 && index < data.length) {
-                                          return SideTitleWidget(
-                                            axisSide: meta.axisSide,
-                                            space: 8.0,
-                                            child: Text(
-                                              data[index]['subjectName'],
-                                              style: const TextStyle(fontSize: 10),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          );
-                                        }
-                                        return const Text('');
-                                      },
-                                      reservedSize: 40,
-                                    ),
-                                  ),
-                                ),
-                                barGroups: data.asMap().entries.map((entry) {
-                                  final index = entry.key;
-                                  final subjectData = entry.value;
-                                  final avgGrade = (subjectData['averageGrade'] as num?)?.toDouble() ?? 0.0;
-                                  return BarChartGroupData(
-                                    x: index,
-                                    barRods: [
-                                      BarChartRodData(
-                                        toY: avgGrade,
-                                        color: Colors.teal,
-                                        width: 16,
-                                      ),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                  ],
+                                          if (_averageGradesFuture != null)
+                                            FutureBuilder<Map<int, double>>(
+                                              future: _averageGradesFuture,
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                  return const Center(child: CircularProgressIndicator());
+                                                } else if (snapshot.hasError) {
+                                                  return Center(child: Text('خطأ: ${snapshot.error}'));
+                                                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                  return const Center(child: Text('لا توجد بيانات درجات لهذا الفصل.'));
+                                                }
+                    
+                                                final data = snapshot.data!; // This is now Map<int, double>
+                                                final subjectProvider = context.read<SubjectProvider>();
+                                                final subjects = subjectProvider.subjects;
+                    
+                                                final List<BarChartGroupData> barGroups = [];
+                                                final List<String> subjectNames = []; // For bottom titles
+                    
+                                                int xIndex = 0;
+                                                data.forEach((subjectId, averageGrade) {
+                                                  final subject = subjects.firstWhere(
+                                                    (s) => s.id == subjectId,
+                                                    orElse: () => Subject(
+                                                        id: subjectId,
+                                                        name: 'غير معروف',
+                                                        subjectId: 'UNKNOWN',
+                                                    ),
+                                                  );
+                                                  subjectNames.add(subject.name);
+                    
+                                                  barGroups.add(
+                                                    BarChartGroupData(
+                                                      x: xIndex,
+                                                      barRods: [
+                                                        BarChartRodData(
+                                                          toY: averageGrade,
+                                                          color: Colors.teal,
+                                                          width: 16,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                  xIndex++;
+                                                });
+                    
+                                                return SizedBox(
+                                                  height: 250,
+                                                  child: BarChart(
+                                                    BarChartData(
+                                                      alignment: BarChartAlignment.spaceAround,
+                                                      maxY: 100, // Assuming grades are out of 100
+                                                      titlesData: FlTitlesData(
+                                                        show: true,
+                                                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                        bottomTitles: AxisTitles(
+                                                          sideTitles: SideTitles(
+                                                            showTitles: true,
+                                                            getTitlesWidget: (double value, TitleMeta meta) {
+                                                              final index = value.toInt();
+                                                              if (index >= 0 && index < subjectNames.length) {
+                                                                return SideTitleWidget(
+                                                                  axisSide: meta.axisSide,
+                                                                  space: 8.0,
+                                                                  child: Text(
+                                                                    subjectNames[index],
+                                                                    style: const TextStyle(fontSize: 10),
+                                                                    overflow: TextOverflow.ellipsis,
+                                                                  ),
+                                                                );
+                                                              }
+                                                              return const Text('');
+                                                            },
+                                                            reservedSize: 40,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      barGroups: barGroups,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),                  ],
                 ),
               ),
             ),

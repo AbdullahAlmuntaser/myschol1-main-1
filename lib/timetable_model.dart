@@ -3,7 +3,7 @@ class TimetableEntry {
   int classId;
   int subjectId;
   int teacherId;
-  String dayOfWeek; // e.g., 'Sunday', 'Monday'
+  int dayOfWeek; // e.g., 1 for Sunday, 2 for Monday
   int lessonNumber; // e.g., 1, 2, 3
   String startTime; // e.g., '08:00'
   String endTime; // e.g., '08:40'

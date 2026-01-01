@@ -218,7 +218,7 @@ class LocalAuthService with ChangeNotifier {
     );
     try {
       final success = await _databaseHelper.updateUserRole(userId, newRole);
-      if (success) {
+      if (success > 0) {
         // Update the user in the local _users list and potentially _currentUser if it's the current user
         await fetchUsers(); // Re-fetch all users to ensure consistency
         if (_currentUser != null && _currentUser!.id == userId) {
@@ -302,9 +302,6 @@ class LocalAuthService with ChangeNotifier {
       return false;
     }
   }
-
-  // Original getUsersByRole is no longer needed as fetchUsers provides all users.
-  // The AdminManageUsersScreen can filter the 'users' list if needed.
 }
 
 extension on User {

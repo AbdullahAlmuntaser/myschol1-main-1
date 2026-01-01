@@ -1,9 +1,8 @@
 class SchoolClass {
   final int? id;
   final String name;
-  final String
-  classId; // Unique identifier for the class (e.g., "10A", "Grade5B")
-  final String? teacherId; // ID of the responsible teacher
+  final String classId; // Unique identifier for the class (e.g., "10A", "Grade5B")
+  final int? teacherId; // ID of the responsible teacher
   final int? capacity; // Maximum number of students
   final String? yearTerm; // Academic year or term
   final List<String>?
@@ -38,7 +37,7 @@ class SchoolClass {
       id: map['id'] as int?,
       name: map['name'] as String,
       classId: map['classId'] as String,
-      teacherId: map['teacherId'] as String?,
+      teacherId: map['teacherId'] as int?,
       capacity: map['capacity'] as int?,
       yearTerm: map['yearTerm'] as String?,
       subjectIds: map['subjectIds'] != null
@@ -59,7 +58,7 @@ class SchoolClass {
     int? id,
     String? name,
     String? classId,
-    String? teacherId,
+    int? teacherId,
     int? capacity,
     String? yearTerm,
     List<String>? subjectIds,

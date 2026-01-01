@@ -903,26 +903,20 @@ class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
           as _i5.Future<void>);
 
   @override
-  _i5.Future<List<Map<String, dynamic>>> getAverageGradesBySubject() =>
+  _i5.Future<Map<int, double>> getAverageGradesBySubject(int? studentId) =>
       (super.noSuchMethod(
-            Invocation.method(#getAverageGradesBySubject, []),
-            returnValue: _i5.Future<List<Map<String, dynamic>>>.value(
-              <Map<String, dynamic>>[],
-            ),
+            Invocation.method(#getAverageGradesBySubject, [studentId]),
+            returnValue: _i5.Future<Map<int, double>>.value(<int, double>{}),
           )
-          as _i5.Future<List<Map<String, dynamic>>>);
+          as _i5.Future<Map<int, double>>);
 
   @override
-  _i5.Future<List<Map<String, dynamic>>> getAverageGradesForClass(
-    int? classId,
-  ) =>
+  _i5.Future<Map<int, double>> getAverageGradesForClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#getAverageGradesForClass, [classId]),
-            returnValue: _i5.Future<List<Map<String, dynamic>>>.value(
-              <Map<String, dynamic>>[],
-            ),
+            returnValue: _i5.Future<Map<int, double>>.value(<int, double>{}),
           )
-          as _i5.Future<List<Map<String, dynamic>>>);
+          as _i5.Future<Map<int, double>>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -974,6 +968,11 @@ class MockLocalAuthService extends _i1.Mock implements _i19.LocalAuthService {
           as bool);
 
   @override
+  List<_i20.User> get users =>
+      (super.noSuchMethod(Invocation.getter(#users), returnValue: <_i20.User>[])
+          as List<_i20.User>);
+
+  @override
   bool get hasListeners =>
       (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
           as bool);
@@ -1001,12 +1000,33 @@ class MockLocalAuthService extends _i1.Mock implements _i19.LocalAuthService {
   );
 
   @override
-  _i5.Future<List<_i20.User>> getUsersByRole(String? role) =>
+  _i5.Future<void> fetchUsers() =>
       (super.noSuchMethod(
-            Invocation.method(#getUsersByRole, [role]),
-            returnValue: _i5.Future<List<_i20.User>>.value(<_i20.User>[]),
+            Invocation.method(#fetchUsers, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i5.Future<List<_i20.User>>);
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<bool> updateUserRole(int? userId, String? newRole) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUserRole, [userId, newRole]),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
+
+  @override
+  _i5.Future<bool> adminCreateUser(
+    String? username,
+    String? password,
+    String? role,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#adminCreateUser, [username, password, role]),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(

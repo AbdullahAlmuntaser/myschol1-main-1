@@ -15,7 +15,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String? _errorMessage;
-  String _selectedRole = 'student'; // Default role is now fixed to student
+  final String _selectedRole = 'student'; // Default role is now fixed to student
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {

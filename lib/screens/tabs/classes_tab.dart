@@ -232,8 +232,7 @@ class ClassesTabState extends State<ClassesTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('معرف الفصل: ${schoolClass.classId}'),
-                if (schoolClass.teacherId != null &&
-                    schoolClass.teacherId!.isNotEmpty)
+                if (schoolClass.teacherId != null)
                   Text('معرف المعلم المسؤول: ${schoolClass.teacherId}'),
                 if (schoolClass.capacity != null)
                   Text('السعة: ${schoolClass.capacity}'),
@@ -290,7 +289,7 @@ class ClassesTabState extends State<ClassesTab> {
             cells: [
               DataCell(Text(schoolClass.name)),
               DataCell(Text(schoolClass.classId)),
-              DataCell(Text(schoolClass.teacherId ?? 'غير متوفر')),
+              DataCell(Text(schoolClass.teacherId?.toString() ?? 'غير متوفر')),
               DataCell(Text(schoolClass.capacity?.toString() ?? 'غير متوفر')),
               DataCell(Text(schoolClass.yearTerm ?? 'غير متوفر')),
               DataCell(Text(subjectNames)),

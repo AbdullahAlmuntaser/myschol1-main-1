@@ -23,14 +23,24 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
   int? _selectedClassId;
   int? _selectedSubjectId;
 
-  late Future<List<Map<String, dynamic>>> _averageGradesFuture;
+  Future<Map<int, double>>? _averageGradesFuture;
 
   @override
   void initState() {
     super.initState();
-    // Fetch data once and hold it in the Future
-    _averageGradesFuture =
-        context.read<GradeProvider>().getAverageGradesBySubject();
+    _updateAverageGrades(); // Initial call
+  }
+
+  void _updateAverageGrades() {
+    setState(() {
+      if (_selectedStudentId != null) {
+        _averageGradesFuture = context
+            .read<GradeProvider>()
+            .getAverageGradesBySubject(_selectedStudentId!);
+      } else {
+        _averageGradesFuture = Future.value({}); // Return an empty map if no student is selected
+      }
+    });
   }
 
   @override
@@ -119,7 +129,7 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
         const SizedBox(height: 16),
         SizedBox(
           height: 200,
-          child: FutureBuilder<List<Map<String, dynamic>>>(
+          child: FutureBuilder<Map<int, double>>(
             future: _averageGradesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -134,23 +144,42 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
               }
 
               final data = snapshot.data!;
+              final subjectProvider = context.read<SubjectProvider>();
+              final subjects = subjectProvider.subjects;
+
+              final List<BarChartGroupData> barGroups = [];
+              final List<String> subjectNames = [];
+
+              int xIndex = 0;
+              data.forEach((subjectId, averageGrade) {
+                final subject = subjects.firstWhere(
+                  (s) => s.id == subjectId,
+                  orElse: () => Subject(
+                      id: subjectId,
+                      name: 'غير معروف',
+                      subjectId: 'UNKNOWN',
+                  ),
+                );
+                subjectNames.add(subject.name);
+
+                barGroups.add(
+                  BarChartGroupData(
+                    x: xIndex,
+                    barRods: [
+                      BarChartRodData(
+                        toY: averageGrade,
+                        color: Colors.blue,
+                        width: 16,
+                      ),
+                    ],
+                  ),
+                );
+                xIndex++;
+              });
+
               return BarChart(
                 BarChartData(
-                  barGroups: data.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final e = entry.value;
-                    final averageGrade = e['averageGrade'] as double;
-                    return BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: averageGrade,
-                          color: Colors.blue,
-                          width: 16,
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                  barGroups: barGroups,
                   titlesData: FlTitlesData(
                     leftTitles: AxisTitles(
                         sideTitles: SideTitles(showTitles: true, interval: 20.0)),
@@ -159,11 +188,11 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
                         showTitles: true,
                         getTitlesWidget: (double value, TitleMeta meta) {
                           final index = value.toInt();
-                          if (index >= 0 && index < data.length) {
+                          if (index >= 0 && index < subjectNames.length) {
                             return SideTitleWidget(
                               axisSide: meta.axisSide,
                               space: 8.0,
-                              child: Text(data[index]['subjectName'] ?? '',
+                              child: Text(subjectNames[index],
                                   overflow: TextOverflow.ellipsis),
                             );
                           }
@@ -199,7 +228,12 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
             items: students.map((s) {
               return DropdownMenuItem(value: s.id, child: Text(s.name));
             }).toList(),
-            onChanged: (value) => setState(() => _selectedStudentId = value),
+            onChanged: (value) {
+              setState(() {
+                _selectedStudentId = value;
+                _updateAverageGrades(); // Call to update chart data
+              });
+            },
           ),
         ),
         const SizedBox(width: 16),

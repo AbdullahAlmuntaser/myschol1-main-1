@@ -20,6 +20,7 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
   }
 
   Future<void> _fetchUsers() async {
+    if (!mounted) return;
     await Provider.of<LocalAuthService>(context, listen: false).fetchUsers();
   }
 
@@ -94,6 +95,8 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
 
   void _editUserRoleDialog(BuildContext context, User user) {
     String selectedRole = user.role;
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -127,27 +130,12 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final authService =
-                    Provider.of<LocalAuthService>(context, listen: false);
-                bool success = await authService.updateUserRole(
+                final success = await authService.updateUserRole(
                   user.id!,
                   selectedRole,
                 );
-                Navigator.pop(dialogContext); // Close the dialog
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم تحديث الدور بنجاح.'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فشل تحديث الدور.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                if (dialogContext.mounted) {
+                  _handleRoleUpdate(success, dialogContext);
                 }
               },
               child: const Text('حفظ'),
@@ -158,11 +146,36 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
     );
   }
 
+  void _handleRoleUpdate(bool success, BuildContext dialogContext) {
+    if (!dialogContext.mounted) return;
+    Navigator.pop(dialogContext); // Close the dialog
+    
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (success) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('تم تحديث الدور بنجاح.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('فشل تحديث الدور.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _createNewUserDialog(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
     String selectedRole = 'student'; // Default role for new users
+
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
 
     showDialog(
       context: context,
@@ -199,7 +212,7 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: selectedRole,
+                    initialValue: selectedRole,
                     decoration: const InputDecoration(labelText: 'الدور'),
                     items: _roles.map((String role) {
                       return DropdownMenuItem<String>(
@@ -225,28 +238,13 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
-                  final authService =
-                      Provider.of<LocalAuthService>(context, listen: false);
-                  bool success = await authService.adminCreateUser(
+                  final success = await authService.adminCreateUser(
                     usernameController.text,
                     passwordController.text,
                     selectedRole,
                   );
-                  Navigator.pop(dialogContext); // Close the dialog
-                  if (success) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('تم إنشاء المستخدم بنجاح.'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('فشل إنشاء المستخدم. قد يكون اسم المستخدم موجودًا.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                  if (dialogContext.mounted) {
+                    _handleUserCreation(success, dialogContext);
                   }
                 }
               },
@@ -256,5 +254,28 @@ class _AdminManageUsersScreenState extends State<AdminManageUsersScreen> {
         );
       },
     );
+  }
+
+  void _handleUserCreation(bool success, BuildContext dialogContext) {
+    if (!dialogContext.mounted) return;
+    Navigator.pop(dialogContext); // Close the dialog
+
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (success) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('تم إنشاء المستخدم بنجاح.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('فشل إنشاء المستخدم. قد يكون اسم المستخدم موجودًا.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

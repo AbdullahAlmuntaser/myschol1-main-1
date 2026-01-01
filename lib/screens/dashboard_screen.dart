@@ -331,9 +331,10 @@ class DashboardSummary extends StatelessWidget {
                     timetableProvider,
                     child,
                   ) {
-                    final currentTeacherId = Provider.of<LocalAuthService>(
+                    final currentUser = Provider.of<LocalAuthService>(
                       context,
-                    ).currentUser?.id.toString();
+                    ).currentUser;
+                    final currentTeacherId = currentUser?.id;
                     final teachersClasses = classProvider.classes
                         .where((c) => c.teacherId == currentTeacherId)
                         .length;
@@ -407,13 +408,14 @@ class DashboardSummary extends StatelessWidget {
                     timetableProvider,
                     child,
                   ) {
-                    final currentUserId = Provider.of<LocalAuthService>(
+                    final currentUser = Provider.of<LocalAuthService>(
                       context,
-                    ).currentUser?.id.toString();
+                    ).currentUser;
+                    final currentUserId = currentUser?.id;
 
                     Student? foundStudent;
                     for (Student s in studentProvider.students) {
-                      if (s.id != null && s.id.toString() == currentUserId) {
+                      if (s.id != null && s.id == currentUserId) {
                         foundStudent = s;
                         break;
                       }
@@ -524,13 +526,14 @@ class DashboardSummary extends StatelessWidget {
             Consumer<StudentProvider>(
               builder: (context, studentProvider, child) {
                 // Assuming a parent can see multiple children associated with their user ID
-                final currentParentUserId = Provider.of<LocalAuthService>(
+                final currentUser = Provider.of<LocalAuthService>(
                   context,
-                ).currentUser?.id.toString();
+                ).currentUser;
+                final currentParentUserId = currentUser?.id;
                 // For now, let's assume students have a parentUserId property or similar
                 // This needs actual implementation in student_model and database_helper
                 final children = studentProvider.students
-                    .where((s) => s.parentUserId.toString() == currentParentUserId)
+                    .where((s) => s.parentUserId == currentParentUserId)
                     .toList(); // Assuming student model has parentUserId
 
                 final childrenCount = children.length;

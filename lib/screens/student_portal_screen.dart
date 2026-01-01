@@ -169,9 +169,17 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
                     ],
                   ),
                   ...timetable.map((entry) {
+                    final List<String> daysOfWeek = [
+                      'الأحد',
+                      'الاثنين',
+                      'الثلاثاء',
+                      'الأربعاء',
+                      'الخميس',
+                    ];
+                    final String dayName = daysOfWeek[entry.dayOfWeek - 1];
                     return TableRow(
                       children: [
-                        TableCell(child: Center(child: Text(entry.dayOfWeek))),
+                        TableCell(child: Center(child: Text(dayName))),
                         TableCell(child: Center(child: Text('${entry.startTime} - ${entry.endTime}'))),
                         TableCell(child: Center(child: Text(entry.subjectId.toString()))),
                       ],

@@ -77,9 +77,9 @@ class _AddEditTimetableScreenState extends State<AddEditTimetableScreen> {
         (s) => s.id == widget.entry!.subjectId,
       );
       _selectedTeacher = teacherProvider.teachers.firstWhere(
-        (t) => t.id == widget.entry!.teacherId,
+        (t) => t.id != null && t.id == widget.entry!.teacherId,
       );
-      _selectedDayOfWeek = widget.entry!.dayOfWeek;
+      _selectedDayOfWeek = _daysOfWeek[widget.entry!.dayOfWeek - 1];
       _selectedLessonNumber = widget.entry!.lessonNumber;
       _startTimeController.text = widget.entry!.startTime;
       _endTimeController.text = widget.entry!.endTime;
@@ -150,7 +150,7 @@ class _AddEditTimetableScreenState extends State<AddEditTimetableScreen> {
       classId: _selectedClass!.id!,
       subjectId: _selectedSubject!.id!,
       teacherId: _selectedTeacher!.id!,
-      dayOfWeek: _selectedDayOfWeek!,
+      dayOfWeek: _daysOfWeek.indexOf(_selectedDayOfWeek!) + 1,
       lessonNumber: _selectedLessonNumber!,
       startTime: _startTimeController.text,
       endTime: _endTimeController.text,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
+
 import 'package:provider/provider.dart';
 import 'dart:developer' as developer; // Added for logging
 
-import '../providers/subject_provider.dart';
+
 import '../providers/teacher_provider.dart';
 import '../teacher_model.dart';
-import '../subject_model.dart';
+
 
 class AddEditTeacherScreen extends StatefulWidget {
   final Teacher? teacher;
@@ -24,7 +24,7 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
   late TextEditingController _passwordController;
   late TextEditingController _phoneController;
   late TextEditingController _qualificationController;
-  List<Subject> _selectedSubjects = [];
+  // List<Subject> _selectedSubjects = []; // Commented out as multi_select_flutter is removed.
 
   @override
   void initState() {
@@ -37,17 +37,17 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
       text: widget.teacher?.qualificationType ?? '',
     );
 
-    if (widget.teacher != null) {
-      // Fetch subjects for the existing teacher
-      final subjectProvider = Provider.of<SubjectProvider>(
-        context,
-        listen: false,
-      );
-      final teacherSubjects = widget.teacher!.subject.split(',');
-      _selectedSubjects = subjectProvider.subjects
-          .where((subject) => teacherSubjects.contains(subject.name))
-          .toList();
-    }
+    // if (widget.teacher != null) {
+    //   // Fetch subjects for the existing teacher
+    //   final subjectProvider = Provider.of<SubjectProvider>(
+    //     context,
+    //     listen: false,
+    //   );
+    //   final teacherSubjects = widget.teacher!.subject.split(',');
+    //   _selectedSubjects = subjectProvider.subjects
+    //       .where((subject) => teacherSubjects.contains(subject.name))
+    //       .toList();
+    // }
   }
 
   @override
@@ -67,7 +67,7 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
         context,
         listen: false,
       );
-      final subjects = _selectedSubjects.map((s) => s.name).join(',');
+      // final subjects = _selectedSubjects.map((s) => s.name).join(',');
 
       final newTeacher = Teacher(
         id: widget.teacher?.id,
@@ -76,7 +76,7 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
         password: _passwordController.text,
         phone: _phoneController.text,
         qualificationType: _qualificationController.text,
-        subject: subjects,
+        subject: '', // Temporarily pass empty string as subject selection is disabled
         responsibleClassId: widget.teacher?.responsibleClassId,
       );
 
@@ -116,8 +116,8 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subjectProvider = Provider.of<SubjectProvider>(context);
-    final allSubjects = subjectProvider.subjects;
+    // final subjectProvider = Provider.of<SubjectProvider>(context);
+    // final allSubjects = subjectProvider.subjects;
 
     return Scaffold(
       appBar: AppBar(
@@ -186,25 +186,25 @@ class _AddEditTeacherScreenState extends State<AddEditTeacherScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
-              MultiSelectDialogField<Subject>(
-                items: allSubjects
-                    .map((s) => MultiSelectItem<Subject>(s, s.name))
-                    .toList(),
-                title: const Text('المواد'),
-                selectedColor: Theme.of(context).primaryColor,
-                onConfirm: (values) {
-                  setState(() {
-                    _selectedSubjects = values;
-                  });
-                },
-                initialValue: _selectedSubjects,
-                chipDisplay: MultiSelectChipDisplay(
-                  items: _selectedSubjects
-                      .map((s) => MultiSelectItem<Subject>(s, s.name))
-                      .toList(),
-                ),
-              ),
+              // const SizedBox(height: 20),
+              // MultiSelectDialogField<Subject>(
+              //   items: allSubjects
+              //       .map((s) => MultiSelectItem<Subject>(s, s.name))
+              //       .toList(),
+              //   title: const Text('المواد'),
+              //   selectedColor: Theme.of(context).primaryColor,
+              //   onConfirm: (values) {
+              //     setState(() {
+              //       _selectedSubjects = values;
+              //     });
+              //   },
+              //   initialValue: _selectedSubjects,
+              //   chipDisplay: MultiSelectChipDisplay(
+              //     items: _selectedSubjects
+              //         .map((s) => MultiSelectItem<Subject>(s, s.name))
+              //         .toList(),
+              //   ),
+              // ),
               const SizedBox(height: 20),
               ElevatedButton(onPressed: _saveTeacher, child: const Text('حفظ')),
             ],

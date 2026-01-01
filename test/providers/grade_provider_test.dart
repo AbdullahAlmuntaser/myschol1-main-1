@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:myapp/providers/grade_provider.dart';
 import 'package:myapp/grade_model.dart';
+import 'package:myapp/database_helper.dart'; // Import DatabaseHelper
 
-import '../mock_generator_test.mocks.dart';
+import 'grade_provider_test.mocks.dart'; // This will be generated
 
+@GenerateMocks([DatabaseHelper])
 void main() {
   late GradeProvider gradeProvider;
   late MockDatabaseHelper mockDatabaseHelper;
@@ -44,7 +47,7 @@ void main() {
         'getGradesByClassAndSubject should call the corresponding method in DatabaseHelper',
         () async {
       // Arrange
-      when(mockDatabaseHelper.getGradesByClassAndSubject(1, 1))
+      when(mockDatabaseHelper.getGradesByClassAndSubject(any, any))
           .thenAnswer((_) async => tGradeList);
 
       // Act
@@ -59,7 +62,7 @@ void main() {
     test('upsertGrades should call the database and then refresh the grades list',
         () async {
       // Arrange
-      when(mockDatabaseHelper.upsertGrades(tGradeList)).thenAnswer((_) async => Future.value());
+      when(mockDatabaseHelper.upsertGrades(any)).thenAnswer((_) async => Future.value());
       when(mockDatabaseHelper.getGrades()).thenAnswer((_) async => tGradeList);
 
       // Act
@@ -84,6 +87,7 @@ void main() {
       verify(mockDatabaseHelper.createGrade(tGrade));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, tGradeList);
+      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
     test('updateGrade should call the database and refresh the list', () async {
@@ -98,6 +102,7 @@ void main() {
       verify(mockDatabaseHelper.updateGrade(tGrade));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, tGradeList);
+      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
     test('deleteGrade should call the database and refresh the list', () async {
@@ -112,6 +117,7 @@ void main() {
       verify(mockDatabaseHelper.deleteGrade(1));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, []);
+      verifyNoMoreInteractions(mockDatabaseHelper);
     });
   });
 }

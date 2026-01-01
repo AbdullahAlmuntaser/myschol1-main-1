@@ -29,7 +29,8 @@ class StudentProvider with ChangeNotifier {
 
   Future<void> searchStudents(String query, {String? classId}) async {
     _setLoading(true);
-    _students = await _dbHelper.searchStudents(query, classId: classId);
+    final int? classIdInt = classId == null ? null : int.tryParse(classId);
+    _students = await _dbHelper.searchStudents(query, classId: classIdInt);
     _setLoading(false);
   }
 

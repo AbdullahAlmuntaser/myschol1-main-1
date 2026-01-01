@@ -71,4 +71,15 @@ class Subject {
       recommendedResources: recommendedResources ?? this.recommendedResources,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Subject &&
+        other.id == id &&
+        other.subjectId == subjectId;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, subjectId);
 }

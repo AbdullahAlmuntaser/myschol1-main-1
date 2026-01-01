@@ -75,7 +75,8 @@ class AddEditStudentScreenState extends State<AddEditStudentScreen> {
 
   Future<void> _fetchParents() async {
     final authService = Provider.of<LocalAuthService>(context, listen: false);
-    final allParentUsers = await authService.getUsersByRole('parent');
+    await authService.fetchUsers();
+    final allParentUsers = authService.users.where((user) => user.role == 'parent').toList();
 
     if (mounted) {
       setState(() {
