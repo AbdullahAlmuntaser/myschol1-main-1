@@ -33,6 +33,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseHelper().database;
   await notificationService.init(); // Initialize NotificationService
+
+  // Temporary code to create an admin user if one doesn't exist
+  final dbHelper = DatabaseHelper();
+  final existingAdmin = await dbHelper.getUserByUsername('admin');
+  if (existingAdmin == null) {
+    developer.log('Creating initial admin user...', name: 'AdminCreation');
+    final authService = LocalAuthService(); // Create an instance of LocalAuthService
+    final success = await authService.adminCreateUser('admin', 'admin123', 'admin');
+    if (success) {
+      developer.log('Initial admin user "admin" created successfully with password "admin123". PLEASE REMOVE THIS CODE AFTER FIRST USE.', name: 'AdminCreation', level: 800);
+    } else {
+      developer.log('Failed to create initial admin user. It might already exist or there was a database error.', name: 'AdminCreation', level: 1000);
+    }
+  } else {
+    developer.log('Admin user "admin" already exists.', name: 'AdminCreation');
+  }
+  // End of temporary code for admin user creation
+
   runApp(const MyApp());
 }
 

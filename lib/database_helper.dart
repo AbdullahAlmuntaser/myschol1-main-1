@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'utils/app_constants.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -288,10 +289,20 @@ class DatabaseHelper {
       CREATE TABLE permissions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         role TEXT NOT NULL,
-        permission TEXT NOT NULL,
-        UNIQUE(role, permission)
+        feature TEXT NOT NULL,
+        isEnabled INTEGER NOT NULL DEFAULT 0,
+        UNIQUE(role, feature)
       );
       ''');
+      
+      // Insert default admin permissions
+      for (var feature in allFeatureData.keys) {
+        await db.insert('permissions', {
+          'role': 'admin',
+          'feature': feature,
+          'isEnabled': 1,
+        });
+      }
     } catch (e) {
       rethrow;
     }

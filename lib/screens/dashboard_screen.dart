@@ -18,6 +18,7 @@ import '../providers/attendance_provider.dart';
 import '../providers/timetable_provider.dart';
 
 import '../utils/app_constants.dart'; // Import new constants file
+import 'admin_tools_screen.dart'; // Import the new AdminToolsScreen
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -76,6 +77,19 @@ class DashboardScreenState extends State<DashboardScreen> {
           appBar: AppBar(
             title: Text('مرحباً، ${currentUser?.username ?? 'زائر'}'),
             actions: [
+              if (userRole == 'admin')
+                IconButton(
+                  icon: const Icon(Icons.admin_panel_settings),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminToolsScreen(),
+                      ),
+                    );
+                  },
+                  tooltip: 'أدوات المسؤول',
+                ),
               Consumer<ThemeProvider>(
                 builder: (context, themeProvider, child) {
                   return IconButton(
