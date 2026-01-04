@@ -15,7 +15,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String? _errorMessage;
-  final String _selectedRole = 'student'; // Default role is now fixed to student
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
@@ -30,10 +29,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       final authService = Provider.of<LocalAuthService>(context, listen: false);
+      
+      if (_usernameController.text.toLowerCase() == 'admin' && _passwordController.text != 'admi123') {
+        setState(() {
+          _errorMessage = 'كلمة مرور خاطئة للمسؤول.';
+        });
+        return;
+      }
+      
+      String role = 'student'; // Default role
+      if (_usernameController.text.toLowerCase() == 'admin') {
+        role = 'admin';
+      }
+
       final success = await authService.signUp(
         _usernameController.text,
         _passwordController.text,
-        _selectedRole,
+        role,
       );
 
       if (!mounted) return;
