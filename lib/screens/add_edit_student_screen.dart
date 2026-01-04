@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../providers/student_provider.dart';
-import '../../student_model.dart';
-import '../../providers/class_provider.dart';
-import '../../class_model.dart';
-import '../../user_model.dart';
-import '../../services/local_auth_service.dart'; // Ensure this is imported
+import '../providers/student_provider.dart';
+import '../student_model.dart';
+import '../providers/class_provider.dart';
+import '../class_model.dart';
+import '../user_model.dart';
+import '../services/local_auth_service.dart'; 
 
 class AddEditStudentScreen extends StatefulWidget {
   final Student? student;

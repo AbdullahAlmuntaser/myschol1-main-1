@@ -3,20 +3,29 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:myapp/database_helper.dart';
 import 'package:myapp/providers/student_provider.dart';
+import 'package:myapp/services/local_auth_service.dart';
 import 'package:myapp/student_model.dart';
+import 'package:myapp/user_model.dart';
 
-import '../student_provider_test.mocks.dart'; // This import is for the generated mock
+import 'student_provider_test.mocks.dart';
 
-// Generate a MockClient using the Mockito package.
-@GenerateMocks([DatabaseHelper])
+@GenerateMocks([DatabaseHelper, LocalAuthService])
 void main() {
   late StudentProvider studentProvider;
   late MockDatabaseHelper mockDatabaseHelper;
+  late MockLocalAuthService mockAuthService;
 
-  // This function runs before each test, ensuring a clean state.
   setUp(() {
     mockDatabaseHelper = MockDatabaseHelper();
-    studentProvider = StudentProvider(databaseHelper: mockDatabaseHelper);
+    mockAuthService = MockLocalAuthService();
+    studentProvider = StudentProvider(
+      databaseHelper: mockDatabaseHelper,
+      authService: mockAuthService,
+    );
+
+    // Mock a logged-in admin user for authorization checks
+    final adminUser = User(id: 1, username: 'admin', role: 'admin', passwordHash: 'hashed_password');
+    when(mockAuthService.currentUser).thenReturn(adminUser);
   });
 
   final tStudent = Student(
@@ -34,76 +43,64 @@ void main() {
 
   group('Database Operations', () {
     test('fetchStudents should get students from the database', () async {
-      // Arrange: When getStudents is called on the mock helper, return a predefined list.
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => tStudentList);
+      // Arrange
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => tStudentList);
 
-      // Act: Call the function we want to test.
+      // Act
       await studentProvider.fetchStudents();
 
-      // Assert: Check if the provider's list now contains the students from the mock.
+      // Assert
       expect(studentProvider.students, tStudentList);
-      verify(
-        mockDatabaseHelper.getStudents(),
-      ); // Verify that the method was called.
-      verifyNoMoreInteractions(
-        mockDatabaseHelper,
-      ); // Ensure no other methods were called.
+      verify(mockDatabaseHelper.getStudents());
+      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
     test('addStudent should call the database and refresh the list', () async {
       // Arrange
       when(mockDatabaseHelper.createStudent(any)).thenAnswer((_) async => 1);
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => tStudentList);
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => tStudentList);
 
       // Act
       await studentProvider.addStudent(tStudent);
 
       // Assert
       verify(mockDatabaseHelper.createStudent(tStudent));
-      verify(
-        mockDatabaseHelper.getStudents(),
-      ); // It should refresh the list after adding.
+      verify(mockDatabaseHelper.getStudents());
       expect(studentProvider.students, tStudentList);
     });
 
-    test(
-      'deleteStudent should call the database and refresh the list',
-      () async {
-        // Arrange
-        when(mockDatabaseHelper.deleteStudent(any)).thenAnswer((_) async => 1);
-        when(
-          mockDatabaseHelper.getStudents(),
-        ).thenAnswer((_) async => []); // Return empty list after delete
+    test('deleteStudent should call the database and refresh the list', () async {
+      // Arrange
+      when(mockDatabaseHelper.deleteStudent(any)).thenAnswer((_) async => 1);
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => []);
 
-        // Act
-        await studentProvider.deleteStudent(1);
+      // Act
+      await studentProvider.deleteStudent(1);
 
-        // Assert
-        verify(mockDatabaseHelper.deleteStudent(1));
-        verify(mockDatabaseHelper.getStudents());
-        expect(studentProvider.students, []);
-      },
-    );
+      // Assert
+      verify(mockDatabaseHelper.deleteStudent(1));
+      verify(mockDatabaseHelper.getStudents());
+      expect(studentProvider.students, []);
+    });
 
-    test(
-      'searchStudents should call the database with the correct query',
-      () async {
-        // Arrange
-        when(
-          mockDatabaseHelper.searchStudents(any),
-        ).thenAnswer((_) async => tStudentList);
+    test('searchStudents should call the database with the correct query', () async {
+      // Arrange
+      when(mockDatabaseHelper.searchStudents(any)).thenAnswer((_) async => tStudentList);
 
-        // Act
-        await studentProvider.searchStudents('Test');
+      // Act
+      await studentProvider.searchStudents('Test');
 
-        // Assert
-        expect(studentProvider.students, tStudentList);
-        verify(mockDatabaseHelper.searchStudents('Test'));
-      },
-    );
+      // Assert
+      expect(studentProvider.students, tStudentList);
+      verify(mockDatabaseHelper.searchStudents('Test'));
+    });
+
+    test('addStudent should throw exception if user is not admin', () async {
+      // Arrange
+      when(mockAuthService.currentUser).thenReturn(User(id: 2, username: 'student', role: 'student', passwordHash: 'hashed_password'));
+
+      // Act & Assert
+      expect(() => studentProvider.addStudent(tStudent), throwsException);
+    });
   });
 }

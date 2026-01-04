@@ -6,6 +6,7 @@ import '../../student_model.dart';
 import '../add_edit_student_screen.dart';
 import '../../providers/class_provider.dart';
 import '../../class_model.dart';
+import '../../services/local_auth_service.dart'; // Import auth service
 
 class StudentsTab extends StatefulWidget {
   const StudentsTab({super.key});
@@ -143,6 +144,10 @@ class StudentsTabState extends State<StudentsTab> {
     final isLargeScreen =
         screenWidth > 600; // Define breakpoint for large screens
 
+    // Get user role and check for admin privileges
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+    final canManageStudents = authService.currentUser?.role == 'admin';
+
     return Scaffold(
       key: const Key('students_tab_view'),
       appBar: AppBar(
@@ -214,22 +219,24 @@ class StudentsTabState extends State<StudentsTab> {
                         );
                       }
                       return isLargeScreen
-                          ? _buildWebLayout(studentProvider.students)
-                          : _buildMobileLayout(studentProvider.students);
+                          ? _buildWebLayout(studentProvider.students, canManageStudents)
+                          : _buildMobileLayout(studentProvider.students, canManageStudents);
                     },
                   ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isLoading ? null : () => _navigateToAddEditScreen(),
-        tooltip: 'إضافة طالب جديد',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canManageStudents // Conditionally show FAB
+          ? FloatingActionButton(
+              onPressed: _isLoading ? null : () => _navigateToAddEditScreen(),
+              tooltip: 'إضافة طالب جديد',
+              child: const Icon(Icons.add),
+            )
+          : null, // Hide if not admin
     );
   }
 
-  Widget _buildMobileLayout(List<Student> students) {
+  Widget _buildMobileLayout(List<Student> students, bool canManage) {
     return ListView.builder(
       itemCount: students.length,
       itemBuilder: (context, index) {
@@ -256,34 +263,36 @@ class StudentsTabState extends State<StudentsTab> {
                 Text('الحالة: ${student.status ? 'نشط' : 'غير نشط'}'),
               ],
             ),
-            trailing: PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'edit') {
-                  _navigateToAddEditScreen(student);
-                } else if (value == 'delete') {
-                  _deleteStudent(student.id!); // Ensure id is not null
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  enabled: !_isLoading,
-                  value: 'edit',
-                  child: const Text('تعديل'),
-                ), // child is last
-                PopupMenuItem(
-                  enabled: !_isLoading,
-                  value: 'delete',
-                  child: const Text('حذف'),
-                ), // child is last
-              ],
-            ),
+            trailing: canManage // Conditionally show PopupMenuButton
+                ? PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        _navigateToAddEditScreen(student);
+                      } else if (value == 'delete') {
+                        _deleteStudent(student.id!); // Ensure id is not null
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        enabled: !_isLoading,
+                        value: 'edit',
+                        child: const Text('تعديل'),
+                      ),
+                      PopupMenuItem(
+                        enabled: !_isLoading,
+                        value: 'delete',
+                        child: const Text('حذف'),
+                      ),
+                    ],
+                  )
+                : null, // Hide if not admin
           ),
         );
       },
     );
   }
 
-  Widget _buildWebLayout(List<Student> students) {
+  Widget _buildWebLayout(List<Student> students, bool canManage) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: DataTable(
@@ -316,24 +325,26 @@ class StudentsTabState extends State<StudentsTab> {
               DataCell(Text(student.parentName ?? 'غير متوفر')),
               DataCell(Text(student.status ? 'نشط' : 'غير نشط')),
               DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: _isLoading
-                          ? null
-                          : () => _navigateToAddEditScreen(student),
-                      tooltip: 'تعديل',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: _isLoading
-                          ? null
-                          : () => _deleteStudent(student.id!),
-                      tooltip: 'حذف',
-                    ),
-                  ],
-                ),
+                canManage // Conditionally show action buttons
+                    ? Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: _isLoading
+                                ? null
+                                : () => _navigateToAddEditScreen(student),
+                            tooltip: 'تعديل',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: _isLoading
+                                ? null
+                                : () => _deleteStudent(student.id!),
+                            tooltip: 'حذف',
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(), // Show empty space if not admin
               ),
             ],
           );

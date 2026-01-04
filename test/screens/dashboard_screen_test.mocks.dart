@@ -3,27 +3,27 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i6;
 
-import 'package:flutter/material.dart' as _i13;
+import 'package:flutter/material.dart' as _i14;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i16;
-import 'package:myapp/attendance_model.dart' as _i15;
-import 'package:myapp/class_model.dart' as _i9;
+import 'package:mockito/src/dummies.dart' as _i17;
+import 'package:myapp/attendance_model.dart' as _i16;
+import 'package:myapp/class_model.dart' as _i10;
 import 'package:myapp/database_helper.dart' as _i2;
-import 'package:myapp/grade_model.dart' as _i18;
-import 'package:myapp/providers/attendance_provider.dart' as _i14;
-import 'package:myapp/providers/class_provider.dart' as _i8;
-import 'package:myapp/providers/grade_provider.dart' as _i17;
-import 'package:myapp/providers/student_provider.dart' as _i3;
-import 'package:myapp/providers/subject_provider.dart' as _i10;
-import 'package:myapp/providers/teacher_provider.dart' as _i6;
-import 'package:myapp/providers/theme_provider.dart' as _i12;
+import 'package:myapp/grade_model.dart' as _i19;
+import 'package:myapp/providers/attendance_provider.dart' as _i15;
+import 'package:myapp/providers/class_provider.dart' as _i9;
+import 'package:myapp/providers/grade_provider.dart' as _i18;
+import 'package:myapp/providers/student_provider.dart' as _i4;
+import 'package:myapp/providers/subject_provider.dart' as _i11;
+import 'package:myapp/providers/teacher_provider.dart' as _i7;
+import 'package:myapp/providers/theme_provider.dart' as _i13;
 import 'package:myapp/providers/timetable_provider.dart' as _i21;
-import 'package:myapp/services/local_auth_service.dart' as _i19;
-import 'package:myapp/student_model.dart' as _i4;
-import 'package:myapp/subject_model.dart' as _i11;
-import 'package:myapp/teacher_model.dart' as _i7;
+import 'package:myapp/services/local_auth_service.dart' as _i3;
+import 'package:myapp/student_model.dart' as _i5;
+import 'package:myapp/subject_model.dart' as _i12;
+import 'package:myapp/teacher_model.dart' as _i8;
 import 'package:myapp/timetable_model.dart' as _i22;
 import 'package:myapp/user_model.dart' as _i20;
 
@@ -48,21 +48,27 @@ class _FakeDatabaseHelper_0 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeLocalAuthService_1 extends _i1.SmartFake
+    implements _i3.LocalAuthService {
+  _FakeLocalAuthService_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [StudentProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockStudentProvider extends _i1.Mock implements _i3.StudentProvider {
+class MockStudentProvider extends _i1.Mock implements _i4.StudentProvider {
   MockStudentProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i4.Student> get students =>
+  List<_i5.Student> get students =>
       (super.noSuchMethod(
             Invocation.getter(#students),
-            returnValue: <_i4.Student>[],
+            returnValue: <_i5.Student>[],
           )
-          as List<_i4.Student>);
+          as List<_i5.Student>);
 
   @override
   bool get isLoading =>
@@ -75,80 +81,80 @@ class MockStudentProvider extends _i1.Mock implements _i3.StudentProvider {
           as bool);
 
   @override
-  _i5.Future<List<_i4.Student>> fetchStudents() =>
+  _i6.Future<List<_i5.Student>> fetchStudents() =>
       (super.noSuchMethod(
             Invocation.method(#fetchStudents, []),
-            returnValue: _i5.Future<List<_i4.Student>>.value(<_i4.Student>[]),
+            returnValue: _i6.Future<List<_i5.Student>>.value(<_i5.Student>[]),
           )
-          as _i5.Future<List<_i4.Student>>);
+          as _i6.Future<List<_i5.Student>>);
 
   @override
-  _i5.Future<void> searchStudents(String? query, {String? classId}) =>
+  _i6.Future<void> searchStudents(String? query, {String? classId}) =>
       (super.noSuchMethod(
             Invocation.method(#searchStudents, [query], {#classId: classId}),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<bool> addStudent(_i4.Student? student) =>
+  _i6.Future<bool> addStudent(_i5.Student? student) =>
       (super.noSuchMethod(
             Invocation.method(#addStudent, [student]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
-  _i5.Future<bool> updateStudent(_i4.Student? student) =>
+  _i6.Future<bool> updateStudent(_i5.Student? student) =>
       (super.noSuchMethod(
             Invocation.method(#updateStudent, [student]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
-  _i5.Future<void> deleteStudent(int? id) =>
+  _i6.Future<void> deleteStudent(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteStudent, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchStudentsByParent(int? parentUserId) =>
+  _i6.Future<void> fetchStudentsByParent(int? parentUserId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchStudentsByParent, [parentUserId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> clearStudents() =>
+  _i6.Future<void> clearStudents() =>
       (super.noSuchMethod(
             Invocation.method(#clearStudents, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<bool> checkEmailUnique(String? email, [int? currentStudentId]) =>
+  _i6.Future<bool> checkEmailUnique(String? email, [int? currentStudentId]) =>
       (super.noSuchMethod(
             Invocation.method(#checkEmailUnique, [email, currentStudentId]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
-  _i5.Future<_i4.Student?> getStudentByUserId(int? userId) =>
+  _i6.Future<_i5.Student?> getStudentByUserId(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getStudentByUserId, [userId]),
-            returnValue: _i5.Future<_i4.Student?>.value(),
+            returnValue: _i6.Future<_i5.Student?>.value(),
           )
-          as _i5.Future<_i4.Student?>);
+          as _i6.Future<_i5.Student?>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -178,18 +184,18 @@ class MockStudentProvider extends _i1.Mock implements _i3.StudentProvider {
 /// A class which mocks [TeacherProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockTeacherProvider extends _i1.Mock implements _i6.TeacherProvider {
+class MockTeacherProvider extends _i1.Mock implements _i7.TeacherProvider {
   MockTeacherProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i7.Teacher> get teachers =>
+  List<_i8.Teacher> get teachers =>
       (super.noSuchMethod(
             Invocation.getter(#teachers),
-            returnValue: <_i7.Teacher>[],
+            returnValue: <_i8.Teacher>[],
           )
-          as List<_i7.Teacher>);
+          as List<_i8.Teacher>);
 
   @override
   bool get hasListeners =>
@@ -197,58 +203,58 @@ class MockTeacherProvider extends _i1.Mock implements _i6.TeacherProvider {
           as bool);
 
   @override
-  _i5.Future<void> fetchTeachers() =>
+  _i6.Future<void> fetchTeachers() =>
       (super.noSuchMethod(
             Invocation.method(#fetchTeachers, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addTeacher(_i7.Teacher? teacher) =>
+  _i6.Future<void> addTeacher(_i8.Teacher? teacher) =>
       (super.noSuchMethod(
             Invocation.method(#addTeacher, [teacher]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateTeacher(_i7.Teacher? teacher) =>
+  _i6.Future<void> updateTeacher(_i8.Teacher? teacher) =>
       (super.noSuchMethod(
             Invocation.method(#updateTeacher, [teacher]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteTeacher(int? id) =>
+  _i6.Future<void> deleteTeacher(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteTeacher, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> searchTeachers(String? name, {String? subject}) =>
+  _i6.Future<void> searchTeachers(String? name, {String? subject}) =>
       (super.noSuchMethod(
             Invocation.method(#searchTeachers, [name], {#subject: subject}),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchTeachersForClass(int? classId) =>
+  _i6.Future<void> fetchTeachersForClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchTeachersForClass, [classId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
   void clearTeachers() => super.noSuchMethod(
@@ -257,12 +263,12 @@ class MockTeacherProvider extends _i1.Mock implements _i6.TeacherProvider {
   );
 
   @override
-  _i5.Future<_i7.Teacher?> getTeacherByUserId(int? userId) =>
+  _i6.Future<_i8.Teacher?> getTeacherByUserId(int? userId) =>
       (super.noSuchMethod(
             Invocation.method(#getTeacherByUserId, [userId]),
-            returnValue: _i5.Future<_i7.Teacher?>.value(),
+            returnValue: _i6.Future<_i8.Teacher?>.value(),
           )
-          as _i5.Future<_i7.Teacher?>);
+          as _i6.Future<_i8.Teacher?>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -292,18 +298,18 @@ class MockTeacherProvider extends _i1.Mock implements _i6.TeacherProvider {
 /// A class which mocks [ClassProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockClassProvider extends _i1.Mock implements _i8.ClassProvider {
+class MockClassProvider extends _i1.Mock implements _i9.ClassProvider {
   MockClassProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i9.SchoolClass> get classes =>
+  List<_i10.SchoolClass> get classes =>
       (super.noSuchMethod(
             Invocation.getter(#classes),
-            returnValue: <_i9.SchoolClass>[],
+            returnValue: <_i10.SchoolClass>[],
           )
-          as List<_i9.SchoolClass>);
+          as List<_i10.SchoolClass>);
 
   @override
   bool get isLoading =>
@@ -316,57 +322,57 @@ class MockClassProvider extends _i1.Mock implements _i8.ClassProvider {
           as bool);
 
   @override
-  _i5.Future<void> fetchClasses() =>
+  _i6.Future<void> fetchClasses() =>
       (super.noSuchMethod(
             Invocation.method(#fetchClasses, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> searchClasses(String? query) =>
+  _i6.Future<void> searchClasses(String? query) =>
       (super.noSuchMethod(
             Invocation.method(#searchClasses, [query]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addClass(_i9.SchoolClass? schoolClass) =>
+  _i6.Future<void> addClass(_i10.SchoolClass? schoolClass) =>
       (super.noSuchMethod(
             Invocation.method(#addClass, [schoolClass]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateClass(_i9.SchoolClass? schoolClass) =>
+  _i6.Future<void> updateClass(_i10.SchoolClass? schoolClass) =>
       (super.noSuchMethod(
             Invocation.method(#updateClass, [schoolClass]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteClass(int? id) =>
+  _i6.Future<void> deleteClass(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteClass, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<_i9.SchoolClass?> getClassByClassIdString(String? classId) =>
+  _i6.Future<_i10.SchoolClass?> getClassByClassIdString(String? classId) =>
       (super.noSuchMethod(
             Invocation.method(#getClassByClassIdString, [classId]),
-            returnValue: _i5.Future<_i9.SchoolClass?>.value(),
+            returnValue: _i6.Future<_i10.SchoolClass?>.value(),
           )
-          as _i5.Future<_i9.SchoolClass?>);
+          as _i6.Future<_i10.SchoolClass?>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -396,18 +402,18 @@ class MockClassProvider extends _i1.Mock implements _i8.ClassProvider {
 /// A class which mocks [SubjectProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSubjectProvider extends _i1.Mock implements _i10.SubjectProvider {
+class MockSubjectProvider extends _i1.Mock implements _i11.SubjectProvider {
   MockSubjectProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i11.Subject> get subjects =>
+  List<_i12.Subject> get subjects =>
       (super.noSuchMethod(
             Invocation.getter(#subjects),
-            returnValue: <_i11.Subject>[],
+            returnValue: <_i12.Subject>[],
           )
-          as List<_i11.Subject>);
+          as List<_i12.Subject>);
 
   @override
   bool get isLoading =>
@@ -420,58 +426,58 @@ class MockSubjectProvider extends _i1.Mock implements _i10.SubjectProvider {
           as bool);
 
   @override
-  _i5.Future<void> fetchSubjects() =>
+  _i6.Future<void> fetchSubjects() =>
       (super.noSuchMethod(
             Invocation.method(#fetchSubjects, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> searchSubjects(String? query) =>
+  _i6.Future<void> searchSubjects(String? query) =>
       (super.noSuchMethod(
             Invocation.method(#searchSubjects, [query]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addSubject(_i11.Subject? subject) =>
+  _i6.Future<void> addSubject(_i12.Subject? subject) =>
       (super.noSuchMethod(
             Invocation.method(#addSubject, [subject]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateSubject(_i11.Subject? subject) =>
+  _i6.Future<void> updateSubject(_i12.Subject? subject) =>
       (super.noSuchMethod(
             Invocation.method(#updateSubject, [subject]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteSubject(int? id) =>
+  _i6.Future<void> deleteSubject(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteSubject, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchSubjectsForClass(int? classId) =>
+  _i6.Future<void> fetchSubjectsForClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchSubjectsForClass, [classId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
   void clearSubjects() => super.noSuchMethod(
@@ -480,12 +486,12 @@ class MockSubjectProvider extends _i1.Mock implements _i10.SubjectProvider {
   );
 
   @override
-  _i5.Future<_i11.Subject?> getSubjectById(int? id) =>
+  _i6.Future<_i12.Subject?> getSubjectById(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#getSubjectById, [id]),
-            returnValue: _i5.Future<_i11.Subject?>.value(),
+            returnValue: _i6.Future<_i12.Subject?>.value(),
           )
-          as _i5.Future<_i11.Subject?>);
+          as _i6.Future<_i12.Subject?>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -515,18 +521,18 @@ class MockSubjectProvider extends _i1.Mock implements _i10.SubjectProvider {
 /// A class which mocks [ThemeProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockThemeProvider extends _i1.Mock implements _i12.ThemeProvider {
+class MockThemeProvider extends _i1.Mock implements _i13.ThemeProvider {
   MockThemeProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i13.ThemeMode get themeMode =>
+  _i14.ThemeMode get themeMode =>
       (super.noSuchMethod(
             Invocation.getter(#themeMode),
-            returnValue: _i13.ThemeMode.system,
+            returnValue: _i14.ThemeMode.system,
           )
-          as _i13.ThemeMode);
+          as _i14.ThemeMode);
 
   @override
   bool get hasListeners =>
@@ -568,18 +574,18 @@ class MockThemeProvider extends _i1.Mock implements _i12.ThemeProvider {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockAttendanceProvider extends _i1.Mock
-    implements _i14.AttendanceProvider {
+    implements _i15.AttendanceProvider {
   MockAttendanceProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i15.Attendance> get attendances =>
+  List<_i16.Attendance> get attendances =>
       (super.noSuchMethod(
             Invocation.getter(#attendances),
-            returnValue: <_i15.Attendance>[],
+            returnValue: <_i16.Attendance>[],
           )
-          as List<_i15.Attendance>);
+          as List<_i16.Attendance>);
 
   @override
   Map<int, Map<String, int>> get studentStats =>
@@ -595,16 +601,16 @@ class MockAttendanceProvider extends _i1.Mock
           as bool);
 
   @override
-  _i5.Future<void> initialize() =>
+  _i6.Future<void> initialize() =>
       (super.noSuchMethod(
             Invocation.method(#initialize, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchAttendances({
+  _i6.Future<void> fetchAttendances({
     String? date,
     int? classId,
     int? subjectId,
@@ -621,52 +627,52 @@ class MockAttendanceProvider extends _i1.Mock
               #studentId: studentId,
               #lessonNumber: lessonNumber,
             }),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addAttendance(_i15.Attendance? attendance) =>
+  _i6.Future<void> addAttendance(_i16.Attendance? attendance) =>
       (super.noSuchMethod(
             Invocation.method(#addAttendance, [attendance]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateAttendance(_i15.Attendance? attendance) =>
+  _i6.Future<void> updateAttendance(_i16.Attendance? attendance) =>
       (super.noSuchMethod(
             Invocation.method(#updateAttendance, [attendance]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteAttendance(int? id) =>
+  _i6.Future<void> deleteAttendance(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteAttendance, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchStudentAttendanceStats(int? studentId, int? classId) =>
+  _i6.Future<void> fetchStudentAttendanceStats(int? studentId, int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchStudentAttendanceStats, [
               studentId,
               classId,
             ]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> setBulkAttendance(
+  _i6.Future<void> setBulkAttendance(
     Map<String, String>? changes,
     int? classId,
     int? subjectId,
@@ -683,10 +689,10 @@ class MockAttendanceProvider extends _i1.Mock
               date,
               lessonNumber,
             ]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
   String getAttendanceStatus(int? studentId, String? date, int? lessonNumber) =>
@@ -696,7 +702,7 @@ class MockAttendanceProvider extends _i1.Mock
               date,
               lessonNumber,
             ]),
-            returnValue: _i16.dummyValue<String>(
+            returnValue: _i17.dummyValue<String>(
               this,
               Invocation.method(#getAttendanceStatus, [
                 studentId,
@@ -708,17 +714,17 @@ class MockAttendanceProvider extends _i1.Mock
           as String);
 
   @override
-  _i5.Future<List<_i15.Attendance>> getAttendancesByStudent(int? studentId) =>
+  _i6.Future<List<_i16.Attendance>> getAttendancesByStudent(int? studentId) =>
       (super.noSuchMethod(
             Invocation.method(#getAttendancesByStudent, [studentId]),
-            returnValue: _i5.Future<List<_i15.Attendance>>.value(
-              <_i15.Attendance>[],
+            returnValue: _i6.Future<List<_i16.Attendance>>.value(
+              <_i16.Attendance>[],
             ),
           )
-          as _i5.Future<List<_i15.Attendance>>);
+          as _i6.Future<List<_i16.Attendance>>);
 
   @override
-  _i5.Future<void> setAttendanceStatus(
+  _i6.Future<void> setAttendanceStatus(
     int? studentId,
     int? classId,
     int? subjectId,
@@ -737,10 +743,10 @@ class MockAttendanceProvider extends _i1.Mock
               lessonNumber,
               status,
             ]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -770,7 +776,7 @@ class MockAttendanceProvider extends _i1.Mock
 /// A class which mocks [GradeProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
+class MockGradeProvider extends _i1.Mock implements _i18.GradeProvider {
   MockGradeProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -787,12 +793,23 @@ class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
           as _i2.DatabaseHelper);
 
   @override
-  List<_i18.Grade> get grades =>
+  _i3.LocalAuthService get authService =>
+      (super.noSuchMethod(
+            Invocation.getter(#authService),
+            returnValue: _FakeLocalAuthService_1(
+              this,
+              Invocation.getter(#authService),
+            ),
+          )
+          as _i3.LocalAuthService);
+
+  @override
+  List<_i19.Grade> get grades =>
       (super.noSuchMethod(
             Invocation.getter(#grades),
-            returnValue: <_i18.Grade>[],
+            returnValue: <_i19.Grade>[],
           )
-          as List<_i18.Grade>);
+          as List<_i19.Grade>);
 
   @override
   bool get isLoading =>
@@ -811,76 +828,85 @@ class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
           as bool);
 
   @override
-  _i5.Future<void> initialize() =>
+  _i6.Future<void> initialize() =>
       (super.noSuchMethod(
             Invocation.method(#initialize, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchGrades() =>
+  _i6.Future<void> fetchGrades() =>
       (super.noSuchMethod(
             Invocation.method(#fetchGrades, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addGrade(_i18.Grade? grade) =>
+  _i6.Future<void> addGrade(_i19.Grade? grade) =>
       (super.noSuchMethod(
             Invocation.method(#addGrade, [grade]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateGrade(_i18.Grade? grade) =>
+  _i6.Future<void> updateGrade(_i19.Grade? grade) =>
       (super.noSuchMethod(
             Invocation.method(#updateGrade, [grade]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteGrade(int? id) =>
+  _i6.Future<void> deleteGrade(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteGrade, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<List<_i18.Grade>> getGradesByStudent(int? studentId) =>
+  _i6.Future<void> upsertGrades(List<_i19.Grade>? grades) =>
+      (super.noSuchMethod(
+            Invocation.method(#upsertGrades, [grades]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<List<_i19.Grade>> getGradesByStudent(int? studentId) =>
       (super.noSuchMethod(
             Invocation.method(#getGradesByStudent, [studentId]),
-            returnValue: _i5.Future<List<_i18.Grade>>.value(<_i18.Grade>[]),
+            returnValue: _i6.Future<List<_i19.Grade>>.value(<_i19.Grade>[]),
           )
-          as _i5.Future<List<_i18.Grade>>);
+          as _i6.Future<List<_i19.Grade>>);
 
   @override
-  _i5.Future<List<_i18.Grade>> getGradesByClass(int? classId) =>
+  _i6.Future<List<_i19.Grade>> getGradesByClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#getGradesByClass, [classId]),
-            returnValue: _i5.Future<List<_i18.Grade>>.value(<_i18.Grade>[]),
+            returnValue: _i6.Future<List<_i19.Grade>>.value(<_i19.Grade>[]),
           )
-          as _i5.Future<List<_i18.Grade>>);
+          as _i6.Future<List<_i19.Grade>>);
 
   @override
-  _i5.Future<List<_i18.Grade>> getGradesBySubject(int? subjectId) =>
+  _i6.Future<List<_i19.Grade>> getGradesBySubject(int? subjectId) =>
       (super.noSuchMethod(
             Invocation.method(#getGradesBySubject, [subjectId]),
-            returnValue: _i5.Future<List<_i18.Grade>>.value(<_i18.Grade>[]),
+            returnValue: _i6.Future<List<_i19.Grade>>.value(<_i19.Grade>[]),
           )
-          as _i5.Future<List<_i18.Grade>>);
+          as _i6.Future<List<_i19.Grade>>);
 
   @override
-  _i5.Future<List<_i18.Grade>> getGradesByClassAndSubject(
+  _i6.Future<List<_i19.Grade>> getGradesByClassAndSubject(
     int? classId,
     int? subjectId,
   ) =>
@@ -889,34 +915,25 @@ class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
               classId,
               subjectId,
             ]),
-            returnValue: _i5.Future<List<_i18.Grade>>.value(<_i18.Grade>[]),
+            returnValue: _i6.Future<List<_i19.Grade>>.value(<_i19.Grade>[]),
           )
-          as _i5.Future<List<_i18.Grade>>);
+          as _i6.Future<List<_i19.Grade>>);
 
   @override
-  _i5.Future<void> upsertGrades(List<_i18.Grade>? grades) =>
-      (super.noSuchMethod(
-            Invocation.method(#upsertGrades, [grades]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
-          )
-          as _i5.Future<void>);
-
-  @override
-  _i5.Future<Map<int, double>> getAverageGradesBySubject(int? studentId) =>
+  _i6.Future<Map<int, double>> getAverageGradesBySubject(int? studentId) =>
       (super.noSuchMethod(
             Invocation.method(#getAverageGradesBySubject, [studentId]),
-            returnValue: _i5.Future<Map<int, double>>.value(<int, double>{}),
+            returnValue: _i6.Future<Map<int, double>>.value(<int, double>{}),
           )
-          as _i5.Future<Map<int, double>>);
+          as _i6.Future<Map<int, double>>);
 
   @override
-  _i5.Future<Map<int, double>> getAverageGradesForClass(int? classId) =>
+  _i6.Future<Map<int, double>> getAverageGradesForClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#getAverageGradesForClass, [classId]),
-            returnValue: _i5.Future<Map<int, double>>.value(<int, double>{}),
+            returnValue: _i6.Future<Map<int, double>>.value(<int, double>{}),
           )
-          as _i5.Future<Map<int, double>>);
+          as _i6.Future<Map<int, double>>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -946,7 +963,7 @@ class MockGradeProvider extends _i1.Mock implements _i17.GradeProvider {
 /// A class which mocks [LocalAuthService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalAuthService extends _i1.Mock implements _i19.LocalAuthService {
+class MockLocalAuthService extends _i1.Mock implements _i3.LocalAuthService {
   MockLocalAuthService() {
     _i1.throwOnMissingStub(this);
   }
@@ -978,20 +995,20 @@ class MockLocalAuthService extends _i1.Mock implements _i19.LocalAuthService {
           as bool);
 
   @override
-  _i5.Future<bool> signIn(String? username, String? password) =>
+  _i6.Future<bool> signIn(String? username, String? password) =>
       (super.noSuchMethod(
             Invocation.method(#signIn, [username, password]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
-  _i5.Future<bool> signUp(String? username, String? password, String? role) =>
+  _i6.Future<bool> signUp(String? username, String? password, String? role) =>
       (super.noSuchMethod(
             Invocation.method(#signUp, [username, password, role]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
   void signOut() => super.noSuchMethod(
@@ -1000,33 +1017,39 @@ class MockLocalAuthService extends _i1.Mock implements _i19.LocalAuthService {
   );
 
   @override
-  _i5.Future<void> fetchUsers() =>
+  void logout() => super.noSuchMethod(
+    Invocation.method(#logout, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i6.Future<void> fetchUsers() =>
       (super.noSuchMethod(
             Invocation.method(#fetchUsers, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<bool> updateUserRole(int? userId, String? newRole) =>
+  _i6.Future<bool> updateUserRole(int? userId, String? newRole) =>
       (super.noSuchMethod(
             Invocation.method(#updateUserRole, [userId, newRole]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
-  _i5.Future<bool> adminCreateUser(
+  _i6.Future<bool> adminCreateUser(
     String? username,
     String? password,
     String? role,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#adminCreateUser, [username, password, role]),
-            returnValue: _i5.Future<bool>.value(false),
+            returnValue: _i6.Future<bool>.value(false),
           )
-          as _i5.Future<bool>);
+          as _i6.Future<bool>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(
@@ -1075,68 +1098,68 @@ class MockTimetableProvider extends _i1.Mock implements _i21.TimetableProvider {
           as bool);
 
   @override
-  _i5.Future<void> fetchTimetableEntries() =>
+  _i6.Future<void> fetchTimetableEntries() =>
       (super.noSuchMethod(
             Invocation.method(#fetchTimetableEntries, []),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<List<_i22.TimetableEntry>> getTimetableByClassId(int? classId) =>
+  _i6.Future<List<_i22.TimetableEntry>> getTimetableByClassId(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#getTimetableByClassId, [classId]),
-            returnValue: _i5.Future<List<_i22.TimetableEntry>>.value(
+            returnValue: _i6.Future<List<_i22.TimetableEntry>>.value(
               <_i22.TimetableEntry>[],
             ),
           )
-          as _i5.Future<List<_i22.TimetableEntry>>);
+          as _i6.Future<List<_i22.TimetableEntry>>);
 
   @override
-  _i5.Future<void> fetchTimetableEntriesByClass(int? classId) =>
+  _i6.Future<void> fetchTimetableEntriesByClass(int? classId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchTimetableEntriesByClass, [classId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> fetchTimetableEntriesByTeacher(int? teacherId) =>
+  _i6.Future<void> fetchTimetableEntriesByTeacher(int? teacherId) =>
       (super.noSuchMethod(
             Invocation.method(#fetchTimetableEntriesByTeacher, [teacherId]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> addTimetableEntry(_i22.TimetableEntry? entry) =>
+  _i6.Future<void> addTimetableEntry(_i22.TimetableEntry? entry) =>
       (super.noSuchMethod(
             Invocation.method(#addTimetableEntry, [entry]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> updateTimetableEntry(_i22.TimetableEntry? entry) =>
+  _i6.Future<void> updateTimetableEntry(_i22.TimetableEntry? entry) =>
       (super.noSuchMethod(
             Invocation.method(#updateTimetableEntry, [entry]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
-  _i5.Future<void> deleteTimetableEntry(int? id) =>
+  _i6.Future<void> deleteTimetableEntry(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteTimetableEntry, [id]),
-            returnValue: _i5.Future<void>.value(),
-            returnValueForMissingStub: _i5.Future<void>.value(),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
           )
-          as _i5.Future<void>);
+          as _i6.Future<void>);
 
   @override
   void addListener(dynamic listener) => super.noSuchMethod(

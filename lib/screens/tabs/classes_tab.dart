@@ -6,6 +6,7 @@ import '../../class_model.dart';
 import '../add_edit_class_screen.dart';
 import '../../providers/subject_provider.dart';
 import '../../subject_model.dart';
+import '../../services/local_auth_service.dart'; // Import auth service
 
 class ClassesTab extends StatefulWidget {
   const ClassesTab({super.key});
@@ -27,18 +28,10 @@ class ClassesTabState extends State<ClassesTab> {
           _isLoading = true;
         });
         try {
-          // Check mounted before using context after async operation
           if (!mounted) return;
-          await Provider.of<ClassProvider>(
-            context,
-            listen: false,
-          ).fetchClasses();
-          // Check mounted before using context after async operation
+          await Provider.of<ClassProvider>(context, listen: false).fetchClasses();
           if (!mounted) return;
-          await Provider.of<SubjectProvider>(
-            context,
-            listen: false,
-          ).fetchSubjects();
+          await Provider.of<SubjectProvider>(context, listen: false).fetchSubjects();
         } finally {
           if (mounted) {
             setState(() {
@@ -62,13 +55,8 @@ class ClassesTabState extends State<ClassesTab> {
       _isLoading = true;
     });
     try {
-      if (!mounted) {
-        return; // Check mounted before using context after async operation
-      }
-      await Provider.of<ClassProvider>(
-        context,
-        listen: false,
-      ).searchClasses(_searchController.text);
+      if (!mounted) return;
+      await Provider.of<ClassProvider>(context, listen: false).searchClasses(_searchController.text);
     } finally {
       if (mounted) {
         setState(() {
@@ -112,10 +100,7 @@ class ClassesTabState extends State<ClassesTab> {
         _isLoading = true;
       });
       try {
-        await Provider.of<ClassProvider>(
-          context,
-          listen: false,
-        ).deleteClass(id);
+        await Provider.of<ClassProvider>(context, listen: false).deleteClass(id);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -141,26 +126,23 @@ class ClassesTabState extends State<ClassesTab> {
     }
   }
 
-  // Helper to get subject names from IDs
   String _getSubjectNames(List<String>? subjectIds, List<Subject> allSubjects) {
-    if (subjectIds == null || subjectIds.isEmpty) {
-      return 'لا توجد مواد';
-    }
-    final names = subjectIds.map((id) {
-      final subject = allSubjects.firstWhere(
-        (s) => s.subjectId == id,
-        orElse: () => Subject(name: 'غير معروف', subjectId: ''),
-      );
-      return subject.name;
-    }).toList();
-    return names.join(', ');
+    if (subjectIds == null || subjectIds.isEmpty) return 'لا توجد مواد';
+    return subjectIds.map((id) {
+      try {
+        return allSubjects.firstWhere((s) => s.subjectId == id).name;
+      } catch (e) {
+        return 'غير معروف';
+      }
+    }).join(', ');
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen =
-        screenWidth > 600; // Define breakpoint for large screens
+    final isLargeScreen = screenWidth > 600;
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+    final canManageClasses = authService.currentUser?.role == 'admin';
 
     return Scaffold(
       appBar: AppBar(title: const Text('الفصول الدراسية')),
@@ -178,7 +160,7 @@ class ClassesTabState extends State<ClassesTab> {
                 ),
               ),
               onChanged: _isLoading ? null : (value) => _filterClasses(),
-              enabled: !_isLoading, // Disable when loading
+              enabled: !_isLoading,
             ),
           ),
           Expanded(
@@ -187,43 +169,32 @@ class ClassesTabState extends State<ClassesTab> {
                 : Consumer2<ClassProvider, SubjectProvider>(
                     builder: (context, classProvider, subjectProvider, child) {
                       if (classProvider.classes.isEmpty) {
-                        return const Center(
-                          child: Text('لا توجد فصول حالياً.'),
-                        );
+                        return const Center(child: Text('لا توجد فصول حالياً.'));
                       }
                       return isLargeScreen
-                          ? _buildDataTable(
-                              classProvider.classes,
-                              subjectProvider.subjects,
-                            )
-                          : _buildListView(
-                              classProvider.classes,
-                              subjectProvider.subjects,
-                            );
+                          ? _buildDataTable(classProvider.classes, subjectProvider.subjects, canManageClasses)
+                          : _buildListView(classProvider.classes, subjectProvider.subjects, canManageClasses);
                     },
                   ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isLoading
-            ? null
-            : () => _navigateToAddEditScreen(), // Disable when loading
-        tooltip: 'إضافة فصل جديد',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canManageClasses
+          ? FloatingActionButton(
+              onPressed: _isLoading ? null : () => _navigateToAddEditScreen(),
+              tooltip: 'إضافة فصل جديد',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
-  Widget _buildListView(List<SchoolClass> classes, List<Subject> allSubjects) {
+  Widget _buildListView(List<SchoolClass> classes, List<Subject> allSubjects, bool canManage) {
     return ListView.builder(
       itemCount: classes.length,
       itemBuilder: (context, index) {
         final schoolClass = classes[index];
-        final subjectNames = _getSubjectNames(
-          schoolClass.subjectIds,
-          allSubjects,
-        );
+        final subjectNames = _getSubjectNames(schoolClass.subjectIds, allSubjects);
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
           child: ListTile(
@@ -232,42 +203,36 @@ class ClassesTabState extends State<ClassesTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('معرف الفصل: ${schoolClass.classId}'),
-                if (schoolClass.teacherId != null)
-                  Text('معرف المعلم المسؤول: ${schoolClass.teacherId}'),
-                if (schoolClass.capacity != null)
-                  Text('السعة: ${schoolClass.capacity}'),
-                if (schoolClass.yearTerm != null &&
-                    schoolClass.yearTerm!.isNotEmpty)
-                  Text('السنة/الفصل الدراسي: ${schoolClass.yearTerm}'),
-                Text('المواد: $subjectNames'), // Display subject names
+                if (schoolClass.teacherId != null) Text('معرف المعلم المسؤول: ${schoolClass.teacherId}'),
+                if (schoolClass.capacity != null) Text('السعة: ${schoolClass.capacity}'),
+                if (schoolClass.yearTerm != null && schoolClass.yearTerm!.isNotEmpty) Text('السنة/الفصل الدراسي: ${schoolClass.yearTerm}'),
+                Text('المواد: $subjectNames'),
               ],
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: _isLoading
-                      ? null
-                      : () => _navigateToAddEditScreen(schoolClass),
-                  tooltip: 'تعديل',
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: _isLoading
-                      ? null
-                      : () => _deleteClass(schoolClass.id!),
-                  tooltip: 'حذف',
-                ),
-              ],
-            ),
+            trailing: canManage
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: _isLoading ? null : () => _navigateToAddEditScreen(schoolClass),
+                        tooltip: 'تعديل',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: _isLoading ? null : () => _deleteClass(schoolClass.id!),
+                        tooltip: 'حذف',
+                      ),
+                    ],
+                  )
+                : null,
           ),
         );
       },
     );
   }
 
-  Widget _buildDataTable(List<SchoolClass> classes, List<Subject> allSubjects) {
+  Widget _buildDataTable(List<SchoolClass> classes, List<Subject> allSubjects, bool canManage) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: DataTable(
@@ -281,10 +246,7 @@ class ClassesTabState extends State<ClassesTab> {
           DataColumn(label: Text('الإجراءات')),
         ],
         rows: classes.map((schoolClass) {
-          final subjectNames = _getSubjectNames(
-            schoolClass.subjectIds,
-            allSubjects,
-          );
+          final subjectNames = _getSubjectNames(schoolClass.subjectIds, allSubjects);
           return DataRow(
             cells: [
               DataCell(Text(schoolClass.name)),
@@ -294,24 +256,22 @@ class ClassesTabState extends State<ClassesTab> {
               DataCell(Text(schoolClass.yearTerm ?? 'غير متوفر')),
               DataCell(Text(subjectNames)),
               DataCell(
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: _isLoading
-                          ? null
-                          : () => _navigateToAddEditScreen(schoolClass),
-                      tooltip: 'تعديل',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: _isLoading
-                          ? null
-                          : () => _deleteClass(schoolClass.id!),
-                      tooltip: 'حذف',
-                    ),
-                  ],
-                ),
+                canManage
+                    ? Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: _isLoading ? null : () => _navigateToAddEditScreen(schoolClass),
+                            tooltip: 'تعديل',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: _isLoading ? null : () => _deleteClass(schoolClass.id!),
+                            tooltip: 'حذف',
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           );

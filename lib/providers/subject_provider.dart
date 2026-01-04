@@ -2,21 +2,33 @@ import 'package:flutter/material.dart';
 import '../custom_exception.dart';
 import '../database_helper.dart';
 import '../subject_model.dart';
+import '../services/local_auth_service.dart'; // Import auth service
 
 class SubjectProvider with ChangeNotifier {
   List<Subject> _subjects = [];
-  bool _isLoading = false; // Add isLoading property
+  bool _isLoading = false;
   final DatabaseHelper _dbHelper;
+  final LocalAuthService _authService; // Add auth service
 
-  SubjectProvider({DatabaseHelper? databaseHelper})
-    : _dbHelper = databaseHelper ?? DatabaseHelper();
+  SubjectProvider({
+    DatabaseHelper? databaseHelper,
+    required LocalAuthService authService, // Require auth service
+  }) : _dbHelper = databaseHelper ?? DatabaseHelper(),
+       _authService = authService;
 
   List<Subject> get subjects => _subjects;
-  bool get isLoading => _isLoading; // Getter for isLoading
+  bool get isLoading => _isLoading;
 
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+
+  void _checkAdminAuthorization() {
+    final userRole = _authService.currentUser?.role;
+    if (userRole != 'admin') {
+      throw Exception('Unauthorized: Only admins can perform this action.');
+    }
   }
 
   Future<void> fetchSubjects() async {
@@ -37,18 +49,15 @@ class SubjectProvider with ChangeNotifier {
   }
 
   Future<void> addSubject(Subject subject) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
-    final existingSubjectByName = await _dbHelper.getSubjectByName(
-      subject.name,
-    );
+    final existingSubjectByName = await _dbHelper.getSubjectByName(subject.name);
     if (existingSubjectByName != null) {
       _setLoading(false);
       throw CustomException('اسم المادة موجود بالفعل.');
     }
 
-    final existingSubjectById = await _dbHelper.getSubjectBySubjectId(
-      subject.subjectId,
-    );
+    final existingSubjectById = await _dbHelper.getSubjectBySubjectId(subject.subjectId);
     if (existingSubjectById != null) {
       _setLoading(false);
       throw CustomException('معرف المادة موجود بالفعل.');
@@ -60,21 +69,15 @@ class SubjectProvider with ChangeNotifier {
   }
 
   Future<void> updateSubject(Subject subject) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
-    // Check for name uniqueness, excluding the current subject
-    final existingSubjectByName = await _dbHelper.getSubjectByName(
-      subject.name,
-    );
-    if (existingSubjectByName != null &&
-        existingSubjectByName.id != subject.id) {
+    final existingSubjectByName = await _dbHelper.getSubjectByName(subject.name);
+    if (existingSubjectByName != null && existingSubjectByName.id != subject.id) {
       _setLoading(false);
       throw CustomException('اسم المادة موجود بالفعل.');
     }
 
-    // Check for subjectId uniqueness, excluding the current subject
-    final existingSubjectById = await _dbHelper.getSubjectBySubjectId(
-      subject.subjectId,
-    );
+    final existingSubjectById = await _dbHelper.getSubjectBySubjectId(subject.subjectId);
     if (existingSubjectById != null && existingSubjectById.id != subject.id) {
       _setLoading(false);
       throw CustomException('معرف المادة موجود بالفعل.');
@@ -86,6 +89,7 @@ class SubjectProvider with ChangeNotifier {
   }
 
   Future<void> deleteSubject(int id) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
     await _dbHelper.deleteSubject(id);
     await fetchSubjects();
@@ -104,7 +108,6 @@ class SubjectProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  // New method to get a subject by ID
   Future<Subject?> getSubjectById(int id) async {
     _setLoading(true);
     final result = await _dbHelper.getSubjectById(id);

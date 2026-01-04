@@ -16,6 +16,7 @@ import 'package:myapp/grade_model.dart' as _i12;
 import 'package:myapp/leave_model.dart' as _i13;
 import 'package:myapp/performance_evaluation_model.dart' as _i14;
 import 'package:myapp/permission_model.dart' as _i15;
+import 'package:myapp/services/local_auth_service.dart' as _i20;
 import 'package:myapp/staff_model.dart' as _i16;
 import 'package:myapp/student_model.dart' as _i8;
 import 'package:myapp/subject_model.dart' as _i17;
@@ -909,4 +910,120 @@ class MockDatabaseHelper extends _i1.Mock implements _i3.DatabaseHelper {
             returnValue: _i4.Future<int>.value(0),
           )
           as _i4.Future<int>);
+}
+
+/// A class which mocks [LocalAuthService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLocalAuthService extends _i1.Mock implements _i20.LocalAuthService {
+  MockLocalAuthService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isAuthenticated =>
+      (super.noSuchMethod(
+            Invocation.getter(#isAuthenticated),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool get isSessionLoading =>
+      (super.noSuchMethod(
+            Invocation.getter(#isSessionLoading),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  List<_i7.User> get users =>
+      (super.noSuchMethod(Invocation.getter(#users), returnValue: <_i7.User>[])
+          as List<_i7.User>);
+
+  @override
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
+
+  @override
+  _i4.Future<bool> signIn(String? username, String? password) =>
+      (super.noSuchMethod(
+            Invocation.method(#signIn, [username, password]),
+            returnValue: _i4.Future<bool>.value(false),
+          )
+          as _i4.Future<bool>);
+
+  @override
+  _i4.Future<bool> signUp(String? username, String? password, String? role) =>
+      (super.noSuchMethod(
+            Invocation.method(#signUp, [username, password, role]),
+            returnValue: _i4.Future<bool>.value(false),
+          )
+          as _i4.Future<bool>);
+
+  @override
+  void signOut() => super.noSuchMethod(
+    Invocation.method(#signOut, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void logout() => super.noSuchMethod(
+    Invocation.method(#logout, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  _i4.Future<void> fetchUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#fetchUsers, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<bool> updateUserRole(int? userId, String? newRole) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUserRole, [userId, newRole]),
+            returnValue: _i4.Future<bool>.value(false),
+          )
+          as _i4.Future<bool>);
+
+  @override
+  _i4.Future<bool> adminCreateUser(
+    String? username,
+    String? password,
+    String? role,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#adminCreateUser, [username, password, role]),
+            returnValue: _i4.Future<bool>.value(false),
+          )
+          as _i4.Future<bool>);
+
+  @override
+  void addListener(dynamic listener) => super.noSuchMethod(
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void removeListener(dynamic listener) => super.noSuchMethod(
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
 }

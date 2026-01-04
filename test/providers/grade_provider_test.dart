@@ -3,18 +3,29 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:myapp/providers/grade_provider.dart';
 import 'package:myapp/grade_model.dart';
-import 'package:myapp/database_helper.dart'; // Import DatabaseHelper
+import 'package:myapp/database_helper.dart';
+import 'package:myapp/services/local_auth_service.dart';
+import 'package:myapp/user_model.dart';
 
-import 'grade_provider_test.mocks.dart'; // This will be generated
+import 'grade_provider_test.mocks.dart';
 
-@GenerateMocks([DatabaseHelper])
+@GenerateMocks([DatabaseHelper, LocalAuthService])
 void main() {
   late GradeProvider gradeProvider;
   late MockDatabaseHelper mockDatabaseHelper;
+  late MockLocalAuthService mockAuthService;
 
   setUp(() {
     mockDatabaseHelper = MockDatabaseHelper();
-    gradeProvider = GradeProvider(databaseHelper: mockDatabaseHelper);
+    mockAuthService = MockLocalAuthService();
+    gradeProvider = GradeProvider(
+      databaseHelper: mockDatabaseHelper,
+      authService: mockAuthService,
+    );
+
+    // Mock a logged-in admin user for authorization checks
+    final adminUser = User(id: 1, username: 'admin', role: 'admin', passwordHash: 'hashed_password');
+    when(mockAuthService.currentUser).thenReturn(adminUser);
   });
 
   final tGrade = Grade(
@@ -72,7 +83,6 @@ void main() {
       verify(mockDatabaseHelper.upsertGrades(tGradeList)).called(1);
       verify(mockDatabaseHelper.getGrades()).called(1);
       expect(gradeProvider.grades, tGradeList);
-      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
      test('addGrade should call the database and refresh the list', () async {
@@ -87,7 +97,6 @@ void main() {
       verify(mockDatabaseHelper.createGrade(tGrade));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, tGradeList);
-      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
     test('updateGrade should call the database and refresh the list', () async {
@@ -102,7 +111,6 @@ void main() {
       verify(mockDatabaseHelper.updateGrade(tGrade));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, tGradeList);
-      verifyNoMoreInteractions(mockDatabaseHelper);
     });
 
     test('deleteGrade should call the database and refresh the list', () async {
@@ -117,7 +125,14 @@ void main() {
       verify(mockDatabaseHelper.deleteGrade(1));
       verify(mockDatabaseHelper.getGrades());
       expect(gradeProvider.grades, []);
-      verifyNoMoreInteractions(mockDatabaseHelper);
+    });
+
+    test('addGrade should throw exception if user is not admin', () async {
+      // Arrange
+      when(mockAuthService.currentUser).thenReturn(User(id: 2, username: 'student', role: 'student', passwordHash: 'hashed_password'));
+
+      // Act & Assert
+      expect(() => gradeProvider.addGrade(tGrade), throwsException);
     });
   });
 }

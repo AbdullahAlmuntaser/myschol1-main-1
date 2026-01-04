@@ -192,6 +192,11 @@ class LocalAuthService with ChangeNotifier {
     );
   }
 
+    void logout() {
+    signOut();
+  }
+
+
   // New: Fetch all users and update the _users list
   Future<void> fetchUsers() async {
     developer.log('LocalAuthService: Fetching all users...', name: 'LocalAuthService');

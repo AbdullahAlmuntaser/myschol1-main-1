@@ -2,21 +2,33 @@ import 'package:flutter/material.dart';
 import '../database_helper.dart';
 import '../class_model.dart';
 import '../custom_exception.dart';
+import '../services/local_auth_service.dart'; // Import auth service
 
 class ClassProvider with ChangeNotifier {
   List<SchoolClass> _classes = [];
-  bool _isLoading = false; // Add isLoading property
+  bool _isLoading = false;
   final DatabaseHelper _dbHelper;
+  final LocalAuthService _authService; // Add auth service
 
-  ClassProvider({DatabaseHelper? databaseHelper})
-      : _dbHelper = databaseHelper ?? DatabaseHelper();
+  ClassProvider({
+    DatabaseHelper? databaseHelper,
+    required LocalAuthService authService, // Require auth service
+  }) : _dbHelper = databaseHelper ?? DatabaseHelper(),
+       _authService = authService;
 
   List<SchoolClass> get classes => _classes;
-  bool get isLoading => _isLoading; // Getter for isLoading
+  bool get isLoading => _isLoading;
 
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+
+  void _checkAdminAuthorization() {
+    final userRole = _authService.currentUser?.role;
+    if (userRole != 'admin') {
+      throw Exception('Unauthorized: Only admins can perform this action.');
+    }
   }
 
   Future<void> fetchClasses() async {
@@ -37,9 +49,9 @@ class ClassProvider with ChangeNotifier {
   }
 
   Future<void> addClass(SchoolClass schoolClass) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
-    final existingClass =
-        await _dbHelper.getClassByClassIdString(schoolClass.classId);
+    final existingClass = await _dbHelper.getClassByClassIdString(schoolClass.classId);
     if (existingClass != null) {
       _setLoading(false);
       throw CustomException('معرف الفصل موجود بالفعل. الرجاء إدخال معرف فريد.');
@@ -50,6 +62,7 @@ class ClassProvider with ChangeNotifier {
   }
 
   Future<void> updateClass(SchoolClass schoolClass) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
     await _dbHelper.updateClass(schoolClass);
     await fetchClasses();
@@ -57,6 +70,7 @@ class ClassProvider with ChangeNotifier {
   }
 
   Future<void> deleteClass(int id) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
     await _dbHelper.deleteClass(id);
     await fetchClasses();
@@ -65,7 +79,6 @@ class ClassProvider with ChangeNotifier {
 
   Future<SchoolClass?> getClassByClassIdString(String classId) async {
     _setLoading(true);
-    // Assuming DatabaseHelper has a method to get a class by its string classId
     final result = await _dbHelper.getClassByClassIdString(classId);
     _setLoading(false);
     return result;

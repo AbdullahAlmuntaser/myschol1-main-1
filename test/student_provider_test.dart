@@ -3,19 +3,28 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:myapp/database_helper.dart';
 import 'package:myapp/providers/student_provider.dart';
+import 'package:myapp/services/local_auth_service.dart';
 import 'package:myapp/student_model.dart';
+import 'package:myapp/user_model.dart';
 
 import 'student_provider_test.mocks.dart';
 
-// Generate a MockClient using the Mockito package.
-@GenerateMocks([DatabaseHelper])
+@GenerateMocks([DatabaseHelper, LocalAuthService])
 void main() {
   late StudentProvider studentProvider;
   late MockDatabaseHelper mockDatabaseHelper;
+  late MockLocalAuthService mockAuthService;
 
   setUp(() {
     mockDatabaseHelper = MockDatabaseHelper();
-    studentProvider = StudentProvider(databaseHelper: mockDatabaseHelper);
+    mockAuthService = MockLocalAuthService();
+    studentProvider = StudentProvider(
+      databaseHelper: mockDatabaseHelper,
+      authService: mockAuthService,
+    );
+    // Mock a logged-in admin user for authorization checks
+    final adminUser = User(id: 1, username: 'admin', role: 'admin', passwordHash: 'hashed_password');
+    when(mockAuthService.currentUser).thenReturn(adminUser);
   });
 
   final tStudent = Student(
@@ -34,9 +43,7 @@ void main() {
   group('fetchStudents', () {
     test('should get students from the database', () async {
       // arrange
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => tStudentList);
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => tStudentList);
 
       // act
       await studentProvider.fetchStudents();
@@ -52,9 +59,7 @@ void main() {
     test('should call createStudent and then fetch students', () async {
       // arrange
       when(mockDatabaseHelper.createStudent(any)).thenAnswer((_) async => 1);
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => tStudentList);
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => tStudentList);
 
       // act
       await studentProvider.addStudent(tStudent);
@@ -70,9 +75,7 @@ void main() {
     test('should call updateStudent and then fetch students', () async {
       // arrange
       when(mockDatabaseHelper.updateStudent(any)).thenAnswer((_) async => 1);
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => tStudentList);
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => tStudentList);
 
       // act
       await studentProvider.updateStudent(tStudent);
@@ -88,9 +91,7 @@ void main() {
     test('should call deleteStudent and then fetch students', () async {
       // arrange
       when(mockDatabaseHelper.deleteStudent(any)).thenAnswer((_) async => 1);
-      when(
-        mockDatabaseHelper.getStudents(),
-      ).thenAnswer((_) async => []); // After deleting, list should be empty
+      when(mockDatabaseHelper.getStudents()).thenAnswer((_) async => []);
 
       // act
       await studentProvider.deleteStudent(tStudent.id!);
@@ -106,9 +107,7 @@ void main() {
     test('should call searchStudents when query is not empty', () async {
       // arrange
       final searchResult = [tStudent];
-      when(
-        mockDatabaseHelper.searchStudents('Test'),
-      ).thenAnswer((_) async => searchResult);
+      when(mockDatabaseHelper.searchStudents('Test')).thenAnswer((_) async => searchResult);
 
       // act
       await studentProvider.searchStudents('Test');
@@ -120,9 +119,7 @@ void main() {
 
     test('should call fetchStudents when query is empty', () async {
       // arrange
-      when(
-        mockDatabaseHelper.searchStudents('', classId: null),
-      ).thenAnswer((_) async => tStudentList);
+      when(mockDatabaseHelper.searchStudents('', classId: null)).thenAnswer((_) async => tStudentList);
 
       // act
       await studentProvider.searchStudents('');
@@ -130,6 +127,14 @@ void main() {
       // assert
       verify(mockDatabaseHelper.searchStudents('', classId: null));
       expect(studentProvider.students, tStudentList);
+    });
+
+    test('addStudent should throw exception if user is not admin', () async {
+      // Arrange
+      when(mockAuthService.currentUser).thenReturn(User(id: 2, username: 'student', role: 'student', passwordHash: 'hashed_password'));
+
+      // Act & Assert
+      expect(() => studentProvider.addStudent(tStudent), throwsException);
     });
   });
 }

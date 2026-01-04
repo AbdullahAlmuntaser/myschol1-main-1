@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer' as developer; // Added import for logging
+import 'dart:developer' as developer;
 
 import '../../providers/subject_provider.dart';
 import '../../subject_model.dart';
 import '../add_edit_subject_screen.dart';
+import '../../services/local_auth_service.dart'; // Import auth service
 
 class SubjectsTab extends StatefulWidget {
   const SubjectsTab({super.key});
@@ -26,10 +27,7 @@ class SubjectsTabState extends State<SubjectsTab> {
           _isLoading = true;
         });
         try {
-          await Provider.of<SubjectProvider>(
-            context,
-            listen: false,
-          ).fetchSubjects();
+          await Provider.of<SubjectProvider>(context, listen: false).fetchSubjects();
         } finally {
           if (mounted) {
             setState(() {
@@ -49,15 +47,11 @@ class SubjectsTabState extends State<SubjectsTab> {
   }
 
   void _filterSubjects() async {
-    // Made async
     setState(() {
       _isLoading = true;
     });
     try {
-      await Provider.of<SubjectProvider>(
-        context,
-        listen: false,
-      ).searchSubjects(_searchController.text);
+      await Provider.of<SubjectProvider>(context, listen: false).searchSubjects(_searchController.text);
     } finally {
       if (mounted) {
         setState(() {
@@ -87,9 +81,7 @@ class SubjectsTabState extends State<SubjectsTab> {
             child: const Text('إلغاء'),
           ),
           TextButton(
-            onPressed: _isLoading
-                ? null
-                : () => Navigator.of(context).pop(true), // Disable when loading
+            onPressed: _isLoading ? null : () => Navigator.of(context).pop(true),
             child: const Text('حذف'),
           ),
         ],
@@ -103,10 +95,7 @@ class SubjectsTabState extends State<SubjectsTab> {
         _isLoading = true;
       });
       try {
-        await Provider.of<SubjectProvider>(
-          context,
-          listen: false,
-        ).deleteSubject(id);
+        await Provider.of<SubjectProvider>(context, listen: false).deleteSubject(id);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -115,20 +104,11 @@ class SubjectsTabState extends State<SubjectsTab> {
           ),
         );
       } catch (e, s) {
-        // Added stack trace parameter 's'
         if (!mounted) return;
-        developer.log(
-          'فشل حذف المادة',
-          name: 'subjects_tab',
-          level: 900, // WARNING
-          error: e,
-          stackTrace: s,
-        );
+        developer.log('فشل حذف المادة', name: 'subjects_tab', level: 900, error: e, stackTrace: s);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'حدث خطأ غير متوقع أثناء حذف المادة. الرجاء المحاولة مرة أخرى.',
-            ), // User-friendly message
+            content: Text('حدث خطأ غير متوقع أثناء حذف المادة. الرجاء المحاولة مرة أخرى.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -144,6 +124,9 @@ class SubjectsTabState extends State<SubjectsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+    final canManageSubjects = authService.currentUser?.role == 'admin';
+
     return Scaffold(
       appBar: AppBar(title: const Text('المواد الدراسية')),
       body: Column(
@@ -155,87 +138,56 @@ class SubjectsTabState extends State<SubjectsTab> {
               decoration: const InputDecoration(
                 labelText: 'البحث باسم المادة أو المعرف',
                 prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
               ),
-              onChanged: _isLoading
-                  ? null
-                  : (value) => _filterSubjects(), // Disable when loading
-              enabled: !_isLoading, // Disable when loading
+              onChanged: _isLoading ? null : (value) => _filterSubjects(),
+              enabled: !_isLoading,
             ),
           ),
           Expanded(
             child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  ) // Show loading indicator
+                ? const Center(child: CircularProgressIndicator())
                 : Consumer<SubjectProvider>(
                     builder: (context, subjectProvider, child) {
                       if (subjectProvider.subjects.isEmpty) {
-                        return const Center(
-                          child: Text('لا توجد مواد حالياً.'),
-                        );
+                        return const Center(child: Text('لا توجد مواد حالياً.'));
                       }
                       return ListView.builder(
                         itemCount: subjectProvider.subjects.length,
                         itemBuilder: (context, index) {
                           final subject = subjectProvider.subjects[index];
                           return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 6.0,
-                            ),
+                            margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                             child: ListTile(
                               title: Text(subject.name),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('معرف المادة: ${subject.subjectId}'),
-                                  if (subject.description != null &&
-                                      subject.description!.isNotEmpty)
-                                    Text('الوصف: ${subject.description}'),
-                                  if (subject.teacherId != null)
-                                    Text(
-                                      'معرف المعلم المسؤول: ${subject.teacherId}',
-                                    ),
-                                  if (subject.curriculumDescription != null &&
-                                      subject.curriculumDescription!.isNotEmpty)
-                                    Text(
-                                      'وصف المنهج: ${subject.curriculumDescription}',
-                                    ),
-                                  if (subject.learningObjectives != null &&
-                                      subject.learningObjectives!.isNotEmpty)
-                                    Text(
-                                      'أهداف التعلم: ${subject.learningObjectives}',
-                                    ),
-                                  if (subject.recommendedResources != null &&
-                                      subject.recommendedResources!.isNotEmpty)
-                                    Text(
-                                      'المصادر الموصى بها: ${subject.recommendedResources}',
-                                    ),
+                                  if (subject.description != null && subject.description!.isNotEmpty) Text('الوصف: ${subject.description}'),
+                                  if (subject.teacherId != null) Text('معرف المعلم المسؤول: ${subject.teacherId}'),
+                                  if (subject.curriculumDescription != null && subject.curriculumDescription!.isNotEmpty) Text('وصف المنهج: ${subject.curriculumDescription}'),
+                                  if (subject.learningObjectives != null && subject.learningObjectives!.isNotEmpty) Text('أهداف التعلم: ${subject.learningObjectives}'),
+                                  if (subject.recommendedResources != null && subject.recommendedResources!.isNotEmpty) Text('المصادر الموصى بها: ${subject.recommendedResources}'),
                                 ],
                               ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: _isLoading
-                                        ? null
-                                        : () =>
-                                              _navigateToAddEditScreen(subject),
-                                    tooltip: 'تعديل',
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: _isLoading
-                                        ? null
-                                        : () => _deleteSubject(subject.id!),
-                                    tooltip: 'حذف',
-                                  ),
-                                ],
-                              ),
+                              trailing: canManageSubjects
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: _isLoading ? null : () => _navigateToAddEditScreen(subject),
+                                          tooltip: 'تعديل',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: _isLoading ? null : () => _deleteSubject(subject.id!),
+                                          tooltip: 'حذف',
+                                        ),
+                                      ],
+                                    )
+                                  : null,
                             ),
                           );
                         },
@@ -245,13 +197,13 @@ class SubjectsTabState extends State<SubjectsTab> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isLoading
-            ? null
-            : () => _navigateToAddEditScreen(), // Disable when loading
-        tooltip: 'إضافة مادة جديدة',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canManageSubjects
+          ? FloatingActionButton(
+              onPressed: _isLoading ? null : () => _navigateToAddEditScreen(),
+              tooltip: 'إضافة مادة جديدة',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

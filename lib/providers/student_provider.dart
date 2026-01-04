@@ -1,23 +1,36 @@
 import 'package:flutter/material.dart';
 import '../database_helper.dart';
 import '../student_model.dart';
+import '../services/local_auth_service.dart'; // Import auth service
 
 class StudentProvider with ChangeNotifier {
   List<Student> _students = [];
-  bool _isLoading = false; // Add isLoading property
+  bool _isLoading = false;
 
-  final DatabaseHelper _dbHelper; // Made private and final
+  final DatabaseHelper _dbHelper;
+  final LocalAuthService _authService; // Add auth service instance
 
-  // Constructor to allow injecting DatabaseHelper for testing
-  StudentProvider({DatabaseHelper? databaseHelper})
-    : _dbHelper = databaseHelper ?? DatabaseHelper();
+  StudentProvider({
+    DatabaseHelper? databaseHelper,
+    required LocalAuthService authService, // Make auth service required
+  })
+    : _dbHelper = databaseHelper ?? DatabaseHelper(),
+      _authService = authService;
 
   List<Student> get students => _students;
-  bool get isLoading => _isLoading; // Getter for isLoading
+  bool get isLoading => _isLoading;
 
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+
+  // Private method to check for admin authorization
+  void _checkAdminAuthorization() {
+    final userRole = _authService.currentUser?.role;
+    if (userRole != 'admin') {
+      throw Exception('Unauthorized: Only admins can perform this action.');
+    }
   }
 
   Future<List<Student>> fetchStudents() async {
@@ -35,8 +48,8 @@ class StudentProvider with ChangeNotifier {
   }
 
   Future<bool> addStudent(Student student) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
-    // Check for email uniqueness before adding
     if (student.email != null && student.email!.isNotEmpty) {
       final existingStudent = await _dbHelper.getStudentByEmail(student.email!);
       if (existingStudent != null) {
@@ -45,14 +58,14 @@ class StudentProvider with ChangeNotifier {
       }
     }
     await _dbHelper.createStudent(student);
-    await fetchStudents(); // Refresh the list
+    await fetchStudents();
     _setLoading(false);
     return true;
   }
 
   Future<bool> updateStudent(Student student) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
-    // Check for email uniqueness before updating, excluding the current student
     if (student.email != null && student.email!.isNotEmpty) {
       final existingStudent = await _dbHelper.getStudentByEmail(student.email!);
       if (existingStudent != null && existingStudent.id != student.id) {
@@ -61,17 +74,20 @@ class StudentProvider with ChangeNotifier {
       }
     }
     await _dbHelper.updateStudent(student);
-    await fetchStudents(); // Refresh the list
+    await fetchStudents();
     _setLoading(false);
     return true;
   }
 
   Future<void> deleteStudent(int id) async {
+    _checkAdminAuthorization(); // Check permissions
     _setLoading(true);
     await _dbHelper.deleteStudent(id);
-    await fetchStudents(); // Refresh the list
+    await fetchStudents();
     _setLoading(false);
   }
+
+  // Read-only methods do not need authorization checks
 
   Future<void> fetchStudentsByParent(int parentUserId) async {
     _setLoading(true);
@@ -85,15 +101,13 @@ class StudentProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  // New method to check email uniqueness (can be used by UI directly)
   Future<bool> checkEmailUnique(String email, [int? currentStudentId]) async {
     _setLoading(true);
     final existingStudent = await _dbHelper.getStudentByEmail(email);
     _setLoading(false);
     if (existingStudent == null) {
-      return true; // Email is unique
+      return true;
     }
-    // If editing, allow the current student to keep their email
     return existingStudent.id == currentStudentId;
   }
 

@@ -9,6 +9,7 @@ import '../../providers/grade_provider.dart';
 import '../../providers/student_provider.dart';
 import '../../providers/class_provider.dart';
 import '../../providers/subject_provider.dart';
+import '../../services/local_auth_service.dart'; // 1. Import LocalAuthService
 import '../add_edit_grade_dialog.dart';
 
 class GradesOverviewTab extends StatefulWidget {
@@ -45,6 +46,11 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
 
   @override
   Widget build(BuildContext context) {
+    // 2. Get user role and determine if they have editing rights
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+    final userRole = authService.currentUser?.role;
+    final bool canEditOrDelete = userRole == 'admin' || userRole == 'teacher';
+
     return Consumer4<GradeProvider, StudentProvider, SubjectProvider,
         ClassProvider>(
       builder: (context, gradeProvider, studentProvider, subjectProvider,
@@ -103,10 +109,10 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
                   builder: (context, constraints) {
                     if (constraints.maxWidth >= 600) {
                       return _buildGradesDataTable(
-                          filteredGrades, studentMap, classMap, subjectMap);
+                          filteredGrades, studentMap, classMap, subjectMap, canEditOrDelete);
                     } else {
                       return _buildGradesList(
-                          filteredGrades, studentMap, classMap, subjectMap);
+                          filteredGrades, studentMap, classMap, subjectMap, canEditOrDelete);
                     }
                   },
                 ),
@@ -118,7 +124,7 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
     );
   }
 
-  Widget _buildChart() {
+    Widget _buildChart() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -265,6 +271,7 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
             _selectedStudentId = null;
             _selectedClassId = null;
             _selectedSubjectId = null;
+            _averageGradesFuture = Future.value({}); // Clear chart
           }),
         ),
       ],
@@ -275,7 +282,8 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
       List<Grade> grades,
       Map<int, Student> studentMap,
       Map<int, SchoolClass> classMap,
-      Map<int, Subject> subjectMap) {
+      Map<int, Subject> subjectMap,
+      bool canEditOrDelete) { // Pass the permission flag
     if (grades.isEmpty) {
       return const Center(child: Text('لا توجد درجات مطابقة للفلتر.'));
     }
@@ -283,7 +291,7 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
       itemCount: grades.length,
       itemBuilder: (context, index) {
         final grade = grades[index];
-        return _buildGradeCard(grade, studentMap, classMap, subjectMap);
+        return _buildGradeCard(grade, studentMap, classMap, subjectMap, canEditOrDelete);
       },
     );
   }
@@ -292,7 +300,8 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
       Grade grade,
       Map<int, Student> studentMap,
       Map<int, SchoolClass> classMap,
-      Map<int, Subject> subjectMap) {
+      Map<int, Subject> subjectMap,
+      bool canEditOrDelete) { // Pass the permission flag
     final studentName = studentMap[grade.studentId]?.name ?? 'غير معروف';
     final className = classMap[grade.classId]?.name ?? 'غير معروف';
     final subjectName = subjectMap[grade.subjectId]?.name ?? 'غير معروف';
@@ -323,50 +332,52 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
             _buildDetailRow('نوع التقييم:', grade.assessmentType),
             _buildDetailRow('الوزن النسبي:', grade.weight.toStringAsFixed(2)),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.blue),
-                  tooltip: 'تعديل',
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AddEditGradeDialog(grade: grade),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  tooltip: 'حذف',
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('تأكيد الحذف'),
-                        content: const Text(
-                            'هل أنت متأكد من رغبتك في حذف هذه الدرجة؟'),
-                        actions: [
-                          TextButton(
-                            child: const Text('إلغاء'),
-                            onPressed: () => Navigator.of(ctx).pop(),
-                          ),
-                          TextButton(
-                            child: const Text('حذف'),
-                            onPressed: () {
-                              context
-                                  .read<GradeProvider>()
-                                  .deleteGrade(grade.id!);
-                              Navigator.of(ctx).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+            // 3. Conditionally render the action buttons
+            if (canEditOrDelete)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    tooltip: 'تعديل',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AddEditGradeDialog(grade: grade),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    tooltip: 'حذف',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('تأكيد الحذف'),
+                          content: const Text(
+                              'هل أنت متأكد من رغبتك في حذف هذه الدرجة؟'),
+                          actions: [
+                            TextButton(
+                              child: const Text('إلغاء'),
+                              onPressed: () => Navigator.of(ctx).pop(),
+                            ),
+                            TextButton(
+                              child: const Text('حذف'),
+                              onPressed: () {
+                                context
+                                    .read<GradeProvider>()
+                                    .deleteGrade(grade.id!);
+                                Navigator.of(ctx).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -390,7 +401,8 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
       List<Grade> grades,
       Map<int, Student> studentMap,
       Map<int, SchoolClass> classMap,
-      Map<int, Subject> subjectMap) {
+      Map<int, Subject> subjectMap,
+      bool canEditOrDelete) { // Pass the permission flag
     if (grades.isEmpty) {
       return const Center(child: Text('لا توجد درجات مطابقة للفلتر.'));
     }
@@ -422,50 +434,53 @@ class _GradesOverviewTabState extends State<GradesOverviewTab> {
                 DataCell(Text(grade.gradeValue.toStringAsFixed(2))),
                 DataCell(Text(grade.weight.toStringAsFixed(2))),
                 DataCell(
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        tooltip: 'تعديل',
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AddEditGradeDialog(grade: grade),
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        tooltip: 'حذف',
-                        onPressed: () {
-                          // Confirmation dialog before deleting
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('تأكيد الحذف'),
-                              content: const Text(
-                                  'هل أنت متأكد من رغبتك في حذف هذه الدرجة؟'),
-                              actions: [
-                                TextButton(
-                                  child: const Text('إلغاء'),
-                                  onPressed: () => Navigator.of(ctx).pop(),
-                                ),
-                                TextButton(
-                                  child: const Text('حذف'),
-                                  onPressed: () {
-                                    context
-                                        .read<GradeProvider>()
-                                        .deleteGrade(grade.id!);
-                                    Navigator.of(ctx).pop();
-                                  },
-                                ),
-                              ],
+                  // 4. Conditionally render the action buttons in the DataTable
+                  canEditOrDelete
+                      ? Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              tooltip: 'تعديل',
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AddEditGradeDialog(grade: grade),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: 'حذف',
+                              onPressed: () {
+                                // Confirmation dialog before deleting
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('تأكيد الحذف'),
+                                    content: const Text(
+                                        'هل أنت متأكد من رغبتك في حذف هذه الدرجة؟'),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text('إلغاء'),
+                                        onPressed: () => Navigator.of(ctx).pop(),
+                                      ),
+                                      TextButton(
+                                        child: const Text('حذف'),
+                                        onPressed: () {
+                                          context
+                                              .read<GradeProvider>()
+                                              .deleteGrade(grade.id!);
+                                          Navigator.of(ctx).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(), // If no permission, show an empty widget
                 ),
               ],
             );

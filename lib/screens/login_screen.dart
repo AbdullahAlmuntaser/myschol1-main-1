@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/local_auth_service.dart';
+import '../screens/role_dispatcher_screen.dart'; // Import the dispatcher
 import 'register_screen.dart';
 import 'dart:developer' as developer;
 import 'package:local_auth/local_auth.dart';
-import '../providers/permission_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,15 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkBiometrics() async {
-    bool canCheckBiometrics;
     try {
-      canCheckBiometrics = await _localAuth.canCheckBiometrics;
+      await _localAuth.canCheckBiometrics;
     } catch (e) {
       developer.log('Error checking biometrics: $e', name: 'LoginScreen');
-      return;
-    }
-    if (canCheckBiometrics) {
-      // Biometrics are available
     }
   }
 
@@ -52,54 +47,45 @@ class _LoginScreenState extends State<LoginScreen> {
         name: 'LoginScreen',
       );
     }
-    if (authenticated) {
-      // Implement your logic here for what happens after successful biometric authentication
-      // For example, you could try to log in with stored credentials
-      // or navigate to a different screen.
-      developer.log('Biometric authentication successful', name: 'LoginScreen');
+    if (authenticated && mounted) {
+       // After successful biometric auth, we should still go through the same logic
+       // For now, let's just navigate to the dispatcher, which will handle the auth check
+       Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const RoleDispatcherScreen()),
+       );
     }
   }
 
   Future<void> _login() async {
-    developer.log('Attempting login...', name: 'LoginScreen');
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _errorMessage = null;
-      });
-      final authService = Provider.of<LocalAuthService>(context, listen: false);
-      final success = await authService.signIn(
-        _usernameController.text,
-        _passwordController.text,
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _errorMessage = null;
+    });
+
+    final authService = Provider.of<LocalAuthService>(context, listen: false);
+    final navigator = Navigator.of(context); // Capture the navigator
+
+    final success = await authService.signIn(
+      _usernameController.text,
+      _passwordController.text,
+    );
+
+    if (success) {
+      // Navigate to the dispatcher, which will then redirect to the correct dashboard.
+      // We use pushReplacement to remove the login screen from the back stack.
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const RoleDispatcherScreen()),
       );
-
-      if (!mounted) return;
-
-      if (!success) {
-        setState(() {
-          _errorMessage = 'اسم المستخدم أو كلمة المرور غير صالحة.';
-        });
-        developer.log(
-          'Login failed for user: ${_usernameController.text}',
-          name: 'LoginScreen',
-          level: 900,
-        );
-      } else {
-        developer.log(
-          'Login successful for user: ${_usernameController.text}',
-          name: 'LoginScreen',
-          level: 800,
-        );
-        final permissionProvider = Provider.of<PermissionProvider>(context, listen: false);
-        await permissionProvider.loadPermissions(authService.currentUser!.role);
-      }
     } else {
-      developer.log(
-        'Login form validation failed.',
-        name: 'LoginScreen',
-        level: 900,
-      );
+      setState(() {
+        _errorMessage = 'اسم المستخدم أو كلمة المرور غير صالحة.';
+      });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
